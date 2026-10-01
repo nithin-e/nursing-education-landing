@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600" role="img" aria-label="Nursing image placeholder">
+  <rect width="800" height="600" fill="#15161F" />
+  <circle cx="400" cy="290" r="200" fill="none" stroke="#FFBF00" stroke-opacity="0.3" stroke-width="3" />
+  <path d="M400 220v140M330 290h140" stroke="#FFBF00" stroke-width="34" stroke-linecap="round" />
+</svg>

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" width="640" height="420" role="img" aria-label="Illustration representing advances in patient care">
+  <rect width="640" height="420" fill="#15161F" />
+  <circle cx="320" cy="210" r="240" fill="#FFBF00" fill-opacity="0.07" />
+  <path d="M0 320h640" stroke="#FFBF00" stroke-opacity="0.18" stroke-width="2" />
+  <g transform="translate(220 70)">
+    <path d="M100 190C60 150 20 124 20 86a52 52 0 0198-24 52 52 0 0198 24c0 38-40 64-80 104z" fill="#FFBF00" fill-opacity="0.16" />
+    <path d="M100 190C60 150 20 124 20 86a52 52 0 0198-24 52 52 0 0198 24c0 38-40 64-80 104z" fill="none" stroke="#FFBF00" stroke-width="5" />
+  </g>
+  <path d="M120 250h70l26-58 40 108 30-64 26 34h130" fill="none" stroke="#FFBF00" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
+  <g stroke="#FFFFFF" stroke-opacity="0.08" stroke-width="2">
+    <path d="M120 330v-24M420 330v-24" />
+  </g>
+  <rect x="96" y="330" width="48" height="10" rx="5" fill="#A3A3A3" fill-opacity="0.6" />
+  <rect x="396" y="330" width="48" height="10" rx="5" fill="#A3A3A3" fill-opacity="0.6" />
+</svg>

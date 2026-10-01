@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" width="640" height="420" role="img" aria-label="Illustration representing nursing education">
+  <rect width="640" height="420" fill="#15161F" />
+  <circle cx="320" cy="200" r="230" fill="#FFBF00" fill-opacity="0.08" />
+  <g transform="translate(180 96)">
+    <rect x="0" y="60" width="200" height="150" rx="10" fill="#23252F" stroke="#FFBF00" stroke-opacity="0.45" />
+    <rect x="30" y="90" width="140" height="12" rx="6" fill="#A3A3A3" fill-opacity="0.7" />
+    <rect x="30" y="118" width="110" height="12" rx="6" fill="#A3A3A3" fill-opacity="0.45" />
+    <rect x="30" y="146" width="128" height="12" rx="6" fill="#A3A3A3" fill-opacity="0.35" />
+    <rect x="30" y="174" width="92" height="12" rx="6" fill="#A3A3A3" fill-opacity="0.3" />
+    <rect x="86" y="24" width="28" height="44" rx="8" fill="#FFBF00" />
+  </g>
+  <g transform="translate(360 130)">
+    <path d="M110 0l24 48 53 8-38 37 9 53-48-25-48 25 9-53-38-37 53-8z" fill="#FFBF00" />
+    <circle cx="110" cy="86" r="34" fill="#15161F" />
+    <path d="M110 66v40M90 86h40" stroke="#FFBF00" stroke-width="9" stroke-linecap="round" />
+  </g>
+</svg>

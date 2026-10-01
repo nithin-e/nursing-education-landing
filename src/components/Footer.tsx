@@ -1,0 +1,155 @@
+import { ArrowUpRight, Mail, MapPin, Phone } from 'lucide-react'
+
+import { NAV_LINKS, POLICY_LINKS, RESOURCE_LINKS, SITE, SOCIAL_LINKS } from '@/data/site'
+import { BRAND_ICONS } from './ui/BrandIcons'
+import Logo from './ui/Logo'
+
+/** Short placeholder policy copy so the footer links resolve to real content. */
+const LEGAL_COPY: Record<string, { title: string; body: string }> = {
+  '#privacy': {
+    title: 'Privacy Policy',
+    body: 'Placeholder policy. This static demo does not collect, store or transmit personal data. No analytics, cookies or third-party trackers are used, and the contact form validates entirely in your browser. Add your full privacy notice before publishing.',
+  },
+  '#terms': {
+    title: 'Terms & Conditions',
+    body: 'Placeholder terms. All content on this demo site is provided for general educational purposes only and does not constitute medical, legal or professional advice. Nursing requirements vary by country and regulator — always confirm official information with the relevant authority before acting on anything you read here.',
+  },
+}
+
+export default function Footer() {
+  const year = new Date().getFullYear()
+
+  return (
+    <footer className="border-t border-charcoal-line bg-charcoal text-paper">
+      <div className="container-page py-16">
+        <div className="grid gap-12 lg:grid-cols-[1.4fr_0.8fr_0.8fr_1fr] lg:gap-10">
+          {/* Brand */}
+          <div className="flex flex-col gap-5">
+            <Logo tone="dark" />
+            <p className="max-w-sm text-sm leading-relaxed text-grey">{SITE.description}</p>
+            <ul className="flex gap-3">
+              {SOCIAL_LINKS.map((social) => {
+                const Icon = BRAND_ICONS[social.label as keyof typeof BRAND_ICONS]
+                return (
+                  <li key={social.label}>
+                    <a
+                      href={social.href}
+                      aria-label={social.label}
+                      className="grid size-10 place-items-center rounded-full border border-white/12 text-paper/75 transition-all duration-200 hover:-translate-y-0.5 hover:border-gold hover:bg-gold hover:text-ink"
+                    >
+                      <Icon />
+                    </a>
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
+
+          {/* Quick links */}
+          <nav aria-labelledby="footer-nav">
+            <h2 id="footer-nav" className="text-sm font-semibold text-paper">
+              Quick Navigation
+            </h2>
+            <ul className="mt-5 flex flex-col gap-3">
+              {NAV_LINKS.map((link) => (
+                <li key={link.label}>
+                  <a
+                    href={link.href}
+                    className="text-sm text-grey transition-colors hover:text-gold"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          {/* Resources */}
+          <nav aria-labelledby="footer-resources">
+            <h2 id="footer-resources" className="text-sm font-semibold text-paper">
+              Nursing Resources
+            </h2>
+            <ul className="mt-5 flex flex-col gap-3">
+              {RESOURCE_LINKS.map((link) => (
+                <li key={link.label}>
+                  <a
+                    href={link.href}
+                    className="text-sm text-grey transition-colors hover:text-gold"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          {/* Contact */}
+          <div>
+            <h2 className="text-sm font-semibold text-paper">Get in Touch</h2>
+            <ul className="mt-5 flex flex-col gap-4">
+              <li className="flex items-start gap-3 text-sm text-grey">
+                <Mail className="mt-0.5 size-4 shrink-0 text-gold" aria-hidden="true" />
+                <a href={`mailto:${SITE.email}`} className="transition-colors hover:text-gold">
+                  {SITE.email}
+                </a>
+              </li>
+              <li className="flex items-start gap-3 text-sm text-grey">
+                <Phone className="mt-0.5 size-4 shrink-0 text-gold" aria-hidden="true" />
+                <a
+                  href={`tel:${SITE.phone.replace(/[^+\d]/g, '')}`}
+                  className="transition-colors hover:text-gold"
+                >
+                  {SITE.phone}
+                </a>
+              </li>
+              <li className="flex items-start gap-3 text-sm text-grey">
+                <MapPin className="mt-0.5 size-4 shrink-0 text-gold" aria-hidden="true" />
+                <span>{SITE.location}</span>
+              </li>
+            </ul>
+
+            <a
+              href="#contact"
+              className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-gold transition-colors hover:text-gold-dark"
+            >
+              Send us a message
+              <ArrowUpRight className="size-4" aria-hidden="true" />
+            </a>
+          </div>
+        </div>
+
+        {/* Legal content targeted by the links below */}
+        <div className="mt-14 grid gap-5 border-t border-white/10 pt-10 md:grid-cols-2">
+          {POLICY_LINKS.map((link) => {
+            const copy = LEGAL_COPY[link.href]
+            return (
+              <section key={link.href} id={link.href.replace('#', '')} className="scroll-mt-24">
+                <h2 className="text-sm font-semibold text-gold">{copy.title}</h2>
+                <p className="mt-2 text-xs leading-relaxed text-grey/85">{copy.body}</p>
+              </section>
+            )
+          })}
+        </div>
+
+        <div className="mt-10 flex flex-col gap-5 border-t border-white/10 pt-7 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs text-grey/80">
+            &copy; {year} {SITE.name}. All rights reserved. Educational content only — not medical
+            advice.
+          </p>
+          <ul className="flex flex-wrap items-center gap-x-6 gap-y-2">
+            {POLICY_LINKS.map((link) => (
+              <li key={link.label}>
+                <a
+                  href={link.href}
+                  className="text-xs text-grey/80 transition-colors hover:text-gold"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </footer>
+  )
+}

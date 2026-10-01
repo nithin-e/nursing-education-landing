@@ -1,0 +1,121 @@
+@import 'tailwindcss';
+
+/* ---------------------------------------------------------------------------
+   Design tokens — theme derived from the reference palette
+   black #000 · charcoal #11121A · gold #FFBF00 · white #FFF · grey #A3A3A3
+--------------------------------------------------------------------------- */
+@theme {
+  --color-ink: #000000;
+  --color-charcoal: #11121a;
+  --color-charcoal-soft: #1a1c26;
+  --color-charcoal-line: #2a2d3a;
+  --color-gold: #ffbf00;
+  --color-gold-dark: #e0a800;
+  --color-paper: #ffffff;
+  --color-mist: #f6f6f7;
+  --color-grey: #a3a3a3;
+
+  --font-display: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  --container-page: 80rem;
+
+  --radius-card: 1rem;
+
+  --animate-marquee: marquee 32s linear infinite;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Base layer
+--------------------------------------------------------------------------- */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 6rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-paper font-sans text-charcoal antialiased;
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display font-semibold tracking-tight text-balance;
+  }
+
+  p {
+    @apply text-pretty;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-4 outline-gold;
+  }
+
+  ::selection {
+    @apply bg-gold text-ink;
+  }
+
+  /* Respect reduced-motion preferences for every animation on the page. */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Component utilities
+--------------------------------------------------------------------------- */
+@utility container-page {
+  width: 100%;
+  margin-inline: auto;
+  max-width: var(--container-page);
+  padding-inline: 1.25rem;
+
+  @media (width >= 40rem) {
+    padding-inline: 2rem;
+  }
+  @media (width >= 80rem) {
+    padding-inline: 2.5rem;
+  }
+}
+
+/* Thin golden scrollbar accent for horizontal rails. */
+@utility scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility text-gradient-gold {
+  background-image: linear-gradient(
+    100deg,
+    var(--color-gold) 0%,
+    #ffe08a 55%,
+    var(--color-gold) 100%
+  );
+  background-clip: text;
+  color: transparent;
+}
