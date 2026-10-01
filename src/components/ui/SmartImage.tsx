@@ -3,6 +3,9 @@ import { useState } from 'react'
 export type SmartImageProps = {
   src: string
   alt: string
+  /** Optional `srcSet` list so phones download a smaller file than desktops. */
+  srcSet?: string
+  sizes?: string
   fallbackSrc?: string
   className?: string
   wrapperClassName?: string
@@ -19,6 +22,8 @@ export type SmartImageProps = {
 export default function SmartImage({
   src,
   alt,
+  srcSet,
+  sizes,
   fallbackSrc = '/images/fallback.svg',
   className = '',
   wrapperClassName = '',
@@ -40,9 +45,13 @@ export default function SmartImage({
     )
   }
 
+  const isPrimary = stage === 0
+
   return (
     <img
-      src={stage === 0 ? src : fallbackSrc}
+      src={isPrimary ? src : fallbackSrc}
+      srcSet={isPrimary ? srcSet : undefined}
+      sizes={isPrimary ? sizes : undefined}
       alt={alt}
       width={width}
       height={height}

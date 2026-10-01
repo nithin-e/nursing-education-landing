@@ -1,46 +1,32 @@
 @import 'tailwindcss';
 
 /* ---------------------------------------------------------------------------
-   Design tokens — theme derived from the reference palette
-   black #000 · charcoal #11121A · gold #FFBF00 · white #FFF · grey #A3A3A3
---------------------------------------------------------------------------- */
+   Design tokens — black #000 · charcoal #11121A · gold #FFBF00 · white #FFF
+   --------------------------------------------------------------------------- */
 @theme {
   --color-ink: #000000;
   --color-charcoal: #11121a;
   --color-charcoal-soft: #1a1c26;
   --color-charcoal-line: #2a2d3a;
   --color-gold: #ffbf00;
-  --color-gold-dark: #e0a800;
+  --color-gold-dark: #b37f00;
   --color-paper: #ffffff;
   --color-mist: #f6f6f7;
   --color-grey: #a3a3a3;
 
-  --font-display: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Manrope', ui-sans-serif, system-ui, sans-serif;
   --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
 
-  --container-page: 80rem;
-
-  --radius-card: 1rem;
-
-  --animate-marquee: marquee 32s linear infinite;
-}
-
-@keyframes marquee {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
+  --container-page: 76rem;
 }
 
 /* ---------------------------------------------------------------------------
    Base layer
---------------------------------------------------------------------------- */
+   --------------------------------------------------------------------------- */
 @layer base {
   html {
     scroll-behavior: smooth;
-    scroll-padding-top: 6rem;
+    scroll-padding-top: 5rem;
     -webkit-text-size-adjust: 100%;
   }
 
@@ -84,8 +70,10 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Component utilities
---------------------------------------------------------------------------- */
+   Layout utilities
+   --------------------------------------------------------------------------- */
+
+/** Single page gutter used by every band on the site. */
 @utility container-page {
   width: 100%;
   margin-inline: auto;
@@ -100,22 +88,16 @@
   }
 }
 
-/* Thin golden scrollbar accent for horizontal rails. */
-@utility scrollbar-none {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-}
+/** Keeps media inside its container at every breakpoint. */
+@utility media-frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-charcoal-soft);
 
-@utility text-gradient-gold {
-  background-image: linear-gradient(
-    100deg,
-    var(--color-gold) 0%,
-    #ffe08a 55%,
-    var(--color-gold) 100%
-  );
-  background-clip: text;
-  color: transparent;
+  img {
+    display: block;
+    width: 100%;
+    object-fit: cover;
+  }
 }

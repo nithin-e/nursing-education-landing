@@ -1,6 +1,5 @@
 import type { FeatureCard as FeatureCardData } from '@/data/nursingData'
 import FeatureCardItem from './FeatureCardItem'
-import Reveal from './Reveal'
 
 export type FeatureCardGridProps = {
   items: FeatureCardData[]
@@ -16,6 +15,10 @@ const columnClasses = {
   4: 'sm:grid-cols-2 xl:grid-cols-4',
 }
 
+/**
+ * Cards are revealed once as a single block by the parent section rather than
+ * staggering individually — animating every tile is both noisy and slower to paint.
+ */
 export default function FeatureCardGrid({
   items,
   tone = 'light',
@@ -24,11 +27,11 @@ export default function FeatureCardGrid({
   columns = 3,
 }: FeatureCardGridProps) {
   return (
-    <ul className={`grid gap-6 ${columnClasses[columns]}`}>
-      {items.map((card, index) => (
-        <Reveal as="li" key={card.title} delay={index * 0.07}>
+    <ul className={`grid gap-4 sm:gap-5 ${columnClasses[columns]}`}>
+      {items.map((card) => (
+        <li key={card.title}>
           <FeatureCardItem card={card} tone={tone} linkHref={linkHref} linkLabel={linkLabel} />
-        </Reveal>
+        </li>
       ))}
     </ul>
   )

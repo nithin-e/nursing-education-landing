@@ -12,23 +12,21 @@ export type FeatureCardItemProps = {
 
 const palettes = {
   light: {
-    surface:
-      'border-charcoal/10 bg-paper hover:border-gold/70 hover:shadow-[0_26px_60px_-36px_rgba(17,18,26,0.5)]',
-    icon: 'bg-charcoal text-gold group-hover:bg-gold group-hover:text-ink',
+    surface: 'border-charcoal/10 bg-paper hover:border-charcoal/30',
+    icon: 'bg-mist text-gold-dark',
     title: 'text-charcoal',
     body: 'text-charcoal/70',
-    chip: 'bg-mist text-charcoal/70',
-    link: 'text-charcoal group-hover:text-gold-dark',
+    chip: 'bg-mist text-charcoal/65',
+    link: 'text-charcoal hover:text-gold-dark',
     divider: 'border-charcoal/10',
   },
   dark: {
-    surface:
-      'border-white/10 bg-charcoal-soft/80 hover:border-gold/70 hover:bg-charcoal-soft hover:shadow-[0_26px_60px_-30px_rgba(0,0,0,0.9)]',
-    icon: 'bg-gold text-ink group-hover:bg-paper group-hover:text-gold',
+    surface: 'border-white/12 bg-charcoal-soft/80 hover:border-white/25',
+    icon: 'bg-white/10 text-gold',
     title: 'text-paper',
     body: 'text-grey',
     chip: 'bg-white/8 text-paper/75',
-    link: 'text-paper group-hover:text-gold',
+    link: 'text-paper hover:text-gold',
     divider: 'border-white/10',
   },
 } as const
@@ -45,20 +43,20 @@ export default function FeatureCardItem({
   return (
     <article
       className={cn(
-        'group flex h-full flex-col gap-5 rounded-2xl border p-7 transition-all duration-300 hover:-translate-y-1.5',
+        'flex h-full flex-col gap-3 rounded-lg border p-5 transition-colors duration-200 sm:p-6',
         p.surface,
       )}
     >
-      <span className={cn('grid size-13 place-items-center rounded-xl transition-colors duration-300', p.icon)}>
-        <Icon className="size-6" aria-hidden="true" />
+      <span className={cn('grid size-10 place-items-center rounded-lg', p.icon)}>
+        <Icon className="size-5" aria-hidden="true" />
       </span>
 
-      <h3 className={cn('text-xl', p.title)}>{card.title}</h3>
+      <h3 className={cn('text-lg', p.title)}>{card.title}</h3>
       <p className={cn('text-sm leading-relaxed', p.body)}>{card.description}</p>
 
-      <ul className="flex flex-wrap gap-2">
+      <ul className="flex flex-wrap gap-1.5">
         {card.points.map((point) => (
-          <li key={point} className={cn('rounded-full px-3 py-1 text-xs font-medium', p.chip)}>
+          <li key={point} className={cn('rounded-md px-2 py-0.5 text-xs font-medium', p.chip)}>
             {point}
           </li>
         ))}
@@ -67,15 +65,12 @@ export default function FeatureCardItem({
       <a
         href={linkHref}
         className={cn(
-          'mt-auto inline-flex items-center gap-1.5 pt-5 text-sm font-semibold transition-colors',
+          'mt-auto inline-flex items-center gap-1.5 pt-4 text-sm font-semibold transition-colors',
           p.link,
         )}
       >
         {linkLabel}
-        <ArrowRight
-          className="size-4 transition-transform duration-300 group-hover:translate-x-1"
-          aria-hidden="true"
-        />
+        <ArrowRight className="size-4" aria-hidden="true" />
       </a>
     </article>
   )

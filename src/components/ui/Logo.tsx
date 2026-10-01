@@ -13,18 +13,16 @@ export default function Logo({ tone = 'light', className = '' }: LogoProps) {
     <span className={cn('flex items-center gap-2.5', className)}>
       <span
         aria-hidden="true"
-        className="relative grid size-9 shrink-0 place-items-center rounded-lg bg-charcoal"
+        className="relative grid size-9 shrink-0 place-items-center rounded-md bg-charcoal"
       >
         <span className="absolute h-4 w-1 rounded-full bg-gold" />
         <span className="absolute h-1 w-4 rounded-full bg-gold" />
       </span>
       <span className="flex flex-col leading-none">
-        <span className={cn('font-display text-base font-bold tracking-tight sm:text-lg', wordmarkTone)}>
+        <span className={cn('font-display text-[1.05rem] font-bold tracking-tight', wordmarkTone)}>
           {SITE.name}
         </span>
-        <span className="mt-0.5 text-[0.6rem] font-medium tracking-[0.22em] text-grey uppercase">
-          Nursing Platform
-        </span>
+        <span className="mt-1 text-[0.68rem] font-medium text-grey">Nursing education platform</span>
       </span>
     </span>
   )

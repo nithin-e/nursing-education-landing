@@ -84,32 +84,31 @@ export default function Contact() {
   }
 
   return (
-    <Section id="contact" tone="dark" className="py-20 sm:py-28">
+    <Section id="contact" tone="dark">
       <SectionBody>
         <SectionHeading
           tone="dark"
+          align="left"
           eyebrow="Contact"
-          title="Get in Touch"
+          title="Get in touch"
           description="Questions about nursing resources, careers or collaboration? Send us a note and our team will get back to you."
         />
 
-        <div className="mt-14 grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-14">
+        <div className="mt-8 grid gap-6 sm:mt-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-10">
           {/* Details */}
-          <Reveal>
-            <div className="flex h-full flex-col gap-6 rounded-2xl border border-white/10 bg-charcoal-soft/70 p-7">
-              <ul className="grid gap-5">
+          <Reveal className="min-w-0">
+            <div className="flex h-full flex-col gap-5 rounded-lg border border-white/10 bg-charcoal-soft/70 p-5 sm:p-7">
+              <ul className="grid gap-4">
                 {CONTACT_DETAILS.map((detail) => {
                   const Icon = detail.icon
                   const content = (
                     <>
-                      <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-gold text-ink">
+                      <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-gold text-ink">
                         <Icon className="size-5" aria-hidden="true" />
                       </span>
                       <span>
-                        <span className="block text-xs font-semibold tracking-[0.16em] text-grey uppercase">
-                          {detail.label}
-                        </span>
-                        <span className="mt-1 block text-sm text-paper">{detail.value}</span>
+                        <span className="block text-[0.8rem] font-semibold text-grey">{detail.label}</span>
+                        <span className="mt-0.5 block text-sm break-words text-paper">{detail.value}</span>
                       </span>
                     </>
                   )
@@ -118,7 +117,7 @@ export default function Contact() {
                       {detail.href ? (
                         <a
                           href={detail.href}
-                          className="flex items-center gap-4 rounded-xl transition-colors hover:text-gold focus-visible:text-gold"
+                          className="flex items-center gap-4 rounded-md transition-colors hover:text-gold focus-visible:text-gold"
                         >
                           {content}
                         </a>
@@ -130,11 +129,9 @@ export default function Contact() {
                 })}
               </ul>
 
-              <div className="mt-auto rounded-xl border border-white/10 bg-ink/60 p-5">
-                <p className="text-xs font-semibold tracking-[0.16em] text-gold uppercase">
-                  Response time
-                </p>
-                <p className="mt-2 text-sm leading-relaxed text-grey">
+              <div className="mt-auto rounded-md border border-white/10 bg-ink/60 p-4">
+                <p className="text-[0.8rem] font-semibold text-gold">Response time</p>
+                <p className="mt-1.5 text-sm leading-relaxed text-grey">
                   Demo content only — placeholder contact details. Typical enquiry replies are sent
                   within two working days once a support system is connected.
                 </p>
@@ -143,18 +140,18 @@ export default function Contact() {
           </Reveal>
 
           {/* Form */}
-          <Reveal delay={0.1}>
+          <Reveal delay={0.08}>
             <form
               onSubmit={handleSubmit}
               noValidate
-              className="rounded-2xl border border-white/10 bg-charcoal-soft/70 p-7 sm:p-9"
+              className="rounded-lg border border-white/10 bg-charcoal-soft/70 p-5 sm:p-8"
             >
-              <h3 className="text-xl text-paper">Send an enquiry</h3>
-              <p className="mt-2 text-sm text-grey">
+              <h3 className="text-lg text-paper">Send an enquiry</h3>
+              <p className="mt-1.5 text-sm text-grey">
                 Fields marked with <span aria-hidden="true">*</span> are required.
               </p>
 
-              <div className="mt-7 grid gap-5 sm:grid-cols-2">
+              <div className="mt-5 grid gap-4 sm:grid-cols-2">
                 <Field
                   id="contact-name"
                   label="Full name"
@@ -176,7 +173,7 @@ export default function Contact() {
                 />
               </div>
 
-              <div className="mt-5">
+              <div className="mt-4">
                 <Field
                   id="contact-subject"
                   label="Subject"
@@ -188,13 +185,13 @@ export default function Contact() {
                 />
               </div>
 
-              <div className="mt-5">
+              <div className="mt-4">
                 <Field
                   id="contact-message"
                   label="Message"
                   required
                   multiline
-                  rows={6}
+                  rows={5}
                   value={fields.message}
                   error={touched ? errors.message : undefined}
                   onChange={handleChange('message')}
@@ -202,10 +199,10 @@ export default function Contact() {
                 />
               </div>
 
-              <div className="mt-7 flex flex-wrap items-center gap-4">
+              <div className="mt-6 flex flex-wrap items-center gap-4">
                 <button
                   type="submit"
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-gold px-7 py-3.5 text-sm font-semibold text-ink transition-all duration-200 hover:bg-gold-dark sm:text-base"
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-semibold text-ink transition-colors duration-200 hover:bg-gold-dark sm:text-base"
                 >
                   Send Message
                   <Send className="size-4" aria-hidden="true" />
@@ -228,7 +225,7 @@ export default function Contact() {
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.3 }}
                     role="status"
-                    className="mt-6 flex items-start gap-3 rounded-xl border border-gold/40 bg-gold/10 p-4"
+                    className="mt-5 flex items-start gap-3 rounded-md border border-gold/40 bg-gold/10 p-4"
                   >
                     <CheckCircle2 className="size-5 shrink-0 text-gold" aria-hidden="true" />
                     <p className="text-sm leading-relaxed text-paper">
@@ -242,7 +239,7 @@ export default function Contact() {
               {touched && !success && Object.keys(errors).some((key) => errors[key as keyof FormErrors]) ? (
                 <p
                   role="alert"
-                  className="mt-6 flex items-start gap-3 rounded-xl border border-red-500/40 bg-red-500/10 p-4 text-sm text-red-200"
+                  className="mt-5 flex items-start gap-3 rounded-md border border-red-500/40 bg-red-500/10 p-4 text-sm text-red-200"
                 >
                   <Info className="size-5 shrink-0" aria-hidden="true" />
                   Please correct the highlighted fields and try again.

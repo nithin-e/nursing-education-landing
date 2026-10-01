@@ -18,7 +18,7 @@ export default function Header() {
   const activeId = useScrollSpy(SECTION_IDS)
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12)
+    const onScroll = () => setScrolled(window.scrollY > 8)
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
@@ -42,18 +42,16 @@ export default function Header() {
   return (
     <header
       className={cn(
-        'sticky top-0 z-50 border-b transition-all duration-300',
-        scrolled
-          ? 'border-charcoal-line/70 bg-charcoal/95 backdrop-blur-md'
-          : 'border-transparent bg-charcoal',
+        'sticky top-0 z-50 border-b transition-colors duration-200',
+        scrolled ? 'border-charcoal-line/60 bg-charcoal/95 backdrop-blur-sm' : 'border-transparent bg-charcoal',
       )}
     >
       <div className="container-page">
-        <div className="flex h-18 items-center justify-between gap-4 py-3">
+        <div className="flex h-16 items-center justify-between gap-4 py-2">
           <a
             href="#home"
             aria-label={`${SITE.name} — home`}
-            className="rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold"
+            className="min-w-0 rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold"
             onClick={() => setMenuOpen(false)}
           >
             <Logo tone="dark" />
@@ -69,20 +67,11 @@ export default function Header() {
                       href={link.href}
                       aria-current={isActive ? 'true' : undefined}
                       className={cn(
-                        'relative rounded-full px-3 py-2 text-[0.82rem] font-medium transition-colors duration-200',
-                        isActive
-                          ? 'text-gold'
-                          : 'text-paper/75 hover:text-gold focus-visible:text-gold',
+                        'relative rounded-md px-2.5 py-2 text-[0.82rem] font-medium transition-colors',
+                        isActive ? 'text-gold' : 'text-paper/80 hover:text-gold',
                       )}
                     >
                       {link.label}
-                      <span
-                        aria-hidden="true"
-                        className={cn(
-                          'absolute inset-x-3 -bottom-0.5 h-px origin-left bg-gold transition-transform duration-200',
-                          isActive ? 'scale-x-100' : 'scale-x-0',
-                        )}
-                      />
                     </a>
                   </li>
                 )
@@ -94,12 +83,12 @@ export default function Header() {
             <button
               type="button"
               aria-label="Search nursing resources"
-              className="hidden size-10 place-items-center rounded-full text-paper/80 transition-colors hover:text-gold md:grid"
+              className="hidden size-9 place-items-center rounded-full text-paper/80 transition-colors hover:text-gold md:grid"
             >
               <Search className="size-5" aria-hidden="true" />
             </button>
 
-            <Button href="#resources" size="sm" className="hidden md:inline-flex">
+            <Button href="#resources" size="sm" className="max-md:hidden">
               Explore Resources
             </Button>
 
@@ -109,13 +98,9 @@ export default function Header() {
               aria-expanded={menuOpen}
               aria-controls="mobile-navigation"
               aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-              className="grid size-10 place-items-center rounded-full border border-white/15 text-paper transition-colors hover:border-gold hover:text-gold xl:hidden"
+              className="grid size-9 place-items-center rounded-md border border-white/15 text-paper transition-colors hover:border-gold hover:text-gold xl:hidden"
             >
-              {menuOpen ? (
-                <X className="size-5" aria-hidden="true" />
-              ) : (
-                <Menu className="size-5" aria-hidden="true" />
-              )}
+              {menuOpen ? <X className="size-5" aria-hidden="true" /> : <Menu className="size-5" aria-hidden="true" />}
             </button>
           </div>
         </div>
@@ -129,17 +114,17 @@ export default function Header() {
             initial={prefersReducedMotion ? false : { height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
             className="overflow-hidden border-t border-charcoal-line bg-charcoal xl:hidden"
           >
             <nav aria-label="Mobile" className="container-page py-4">
-              <ul className="flex flex-col gap-1">
+              <ul className="flex flex-col gap-0.5">
                 {NAV_LINKS.map((link) => (
                   <li key={link.label}>
                     <a
                       href={link.href}
                       onClick={() => setMenuOpen(false)}
-                      className="flex items-center justify-between rounded-xl px-4 py-3 text-base font-medium text-paper/85 transition-colors hover:bg-white/5 hover:text-gold"
+                      className="flex items-center justify-between rounded-md px-3 py-2.5 text-[0.95rem] font-medium text-paper/85 transition-colors hover:bg-white/5 hover:text-gold"
                     >
                       {link.label}
                     </a>
@@ -153,7 +138,7 @@ export default function Header() {
                 <button
                   type="button"
                   aria-label="Search nursing resources"
-                  className="grid size-12 place-items-center rounded-full border border-white/20 text-paper transition-colors hover:border-gold hover:text-gold"
+                  className="grid size-11 place-items-center rounded-md border border-white/20 text-paper transition-colors hover:border-gold hover:text-gold"
                 >
                   <Search className="size-5" aria-hidden="true" />
                 </button>

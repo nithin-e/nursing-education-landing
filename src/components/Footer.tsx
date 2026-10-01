@@ -21,13 +21,13 @@ export default function Footer() {
 
   return (
     <footer className="border-t border-charcoal-line bg-charcoal text-paper">
-      <div className="container-page py-16">
-        <div className="grid gap-12 lg:grid-cols-[1.4fr_0.8fr_0.8fr_1fr] lg:gap-10">
+      <div className="container-page py-14">
+        <div className="grid gap-10 lg:grid-cols-[1.4fr_0.8fr_0.8fr_1fr] lg:gap-10">
           {/* Brand */}
-          <div className="flex flex-col gap-5">
+          <div className="flex min-w-0 flex-col gap-4">
             <Logo tone="dark" />
-            <p className="max-w-sm text-sm leading-relaxed text-grey">{SITE.description}</p>
-            <ul className="flex gap-3">
+            <p className="max-w-sm text-[0.95rem] leading-relaxed text-grey">{SITE.description}</p>
+            <ul className="flex gap-2">
               {SOCIAL_LINKS.map((social) => {
                 const Icon = BRAND_ICONS[social.label as keyof typeof BRAND_ICONS]
                 return (
@@ -35,7 +35,7 @@ export default function Footer() {
                     <a
                       href={social.href}
                       aria-label={social.label}
-                      className="grid size-10 place-items-center rounded-full border border-white/12 text-paper/75 transition-all duration-200 hover:-translate-y-0.5 hover:border-gold hover:bg-gold hover:text-ink"
+                      className="grid size-9 place-items-center rounded-md border border-white/12 text-paper/75 transition-colors hover:border-gold hover:text-gold"
                     >
                       <Icon />
                     </a>
@@ -47,16 +47,11 @@ export default function Footer() {
 
           {/* Quick links */}
           <nav aria-labelledby="footer-nav">
-            <h2 id="footer-nav" className="text-sm font-semibold text-paper">
-              Quick Navigation
-            </h2>
-            <ul className="mt-5 flex flex-col gap-3">
+            <h2 id="footer-nav" className="text-sm font-semibold text-paper">Quick Navigation</h2>
+            <ul className="mt-4 flex flex-col gap-2">
               {NAV_LINKS.map((link) => (
                 <li key={link.label}>
-                  <a
-                    href={link.href}
-                    className="text-sm text-grey transition-colors hover:text-gold"
-                  >
+                  <a href={link.href} className="text-sm text-grey transition-colors hover:text-gold">
                     {link.label}
                   </a>
                 </li>
@@ -66,16 +61,11 @@ export default function Footer() {
 
           {/* Resources */}
           <nav aria-labelledby="footer-resources">
-            <h2 id="footer-resources" className="text-sm font-semibold text-paper">
-              Nursing Resources
-            </h2>
-            <ul className="mt-5 flex flex-col gap-3">
+            <h2 id="footer-resources" className="text-sm font-semibold text-paper">Nursing Resources</h2>
+            <ul className="mt-4 flex flex-col gap-2">
               {RESOURCE_LINKS.map((link) => (
                 <li key={link.label}>
-                  <a
-                    href={link.href}
-                    className="text-sm text-grey transition-colors hover:text-gold"
-                  >
+                  <a href={link.href} className="text-sm text-grey transition-colors hover:text-gold">
                     {link.label}
                   </a>
                 </li>
@@ -86,21 +76,14 @@ export default function Footer() {
           {/* Contact */}
           <div>
             <h2 className="text-sm font-semibold text-paper">Get in Touch</h2>
-            <ul className="mt-5 flex flex-col gap-4">
+            <ul className="mt-4 flex flex-col gap-3.5">
               <li className="flex items-start gap-3 text-sm text-grey">
                 <Mail className="mt-0.5 size-4 shrink-0 text-gold" aria-hidden="true" />
-                <a href={`mailto:${SITE.email}`} className="transition-colors hover:text-gold">
-                  {SITE.email}
-                </a>
+                <a href={`mailto:${SITE.email}`} className="break-words transition-colors hover:text-gold">{SITE.email}</a>
               </li>
               <li className="flex items-start gap-3 text-sm text-grey">
                 <Phone className="mt-0.5 size-4 shrink-0 text-gold" aria-hidden="true" />
-                <a
-                  href={`tel:${SITE.phone.replace(/[^+\d]/g, '')}`}
-                  className="transition-colors hover:text-gold"
-                >
-                  {SITE.phone}
-                </a>
+                <a href={`tel:${SITE.phone.replace(/[^+\d]/g, '')}`} className="transition-colors hover:text-gold">{SITE.phone}</a>
               </li>
               <li className="flex items-start gap-3 text-sm text-grey">
                 <MapPin className="mt-0.5 size-4 shrink-0 text-gold" aria-hidden="true" />
@@ -108,43 +91,34 @@ export default function Footer() {
               </li>
             </ul>
 
-            <a
-              href="#contact"
-              className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-gold transition-colors hover:text-gold-dark"
-            >
+            <a href="#contact" className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-gold transition-colors hover:text-gold-dark">
               Send us a message
               <ArrowUpRight className="size-4" aria-hidden="true" />
             </a>
           </div>
         </div>
 
-        {/* Legal content targeted by the links below */}
-        <div className="mt-14 grid gap-5 border-t border-white/10 pt-10 md:grid-cols-2">
+        {/* Legal */}
+        <div className="mt-10 grid gap-4 border-t border-white/10 pt-8 md:grid-cols-2">
           {POLICY_LINKS.map((link) => {
             const copy = LEGAL_COPY[link.href]
             return (
               <section key={link.href} id={link.href.replace('#', '')} className="scroll-mt-24">
                 <h2 className="text-sm font-semibold text-gold">{copy.title}</h2>
-                <p className="mt-2 text-xs leading-relaxed text-grey/85">{copy.body}</p>
+                <p className="mt-1.5 text-xs leading-relaxed text-grey/85">{copy.body}</p>
               </section>
             )
           })}
         </div>
 
-        <div className="mt-10 flex flex-col gap-5 border-t border-white/10 pt-7 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-8 flex flex-col gap-4 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-grey/80">
-            &copy; {year} {SITE.name}. All rights reserved. Educational content only — not medical
-            advice.
+            &copy; {year} {SITE.name}. All rights reserved. Educational content only — not medical advice.
           </p>
-          <ul className="flex flex-wrap items-center gap-x-6 gap-y-2">
+          <ul className="flex flex-wrap items-center gap-x-5 gap-y-2">
             {POLICY_LINKS.map((link) => (
               <li key={link.label}>
-                <a
-                  href={link.href}
-                  className="text-xs text-grey/80 transition-colors hover:text-gold"
-                >
-                  {link.label}
-                </a>
+                <a href={link.href} className="text-xs text-grey/80 transition-colors hover:text-gold">{link.label}</a>
               </li>
             ))}
           </ul>

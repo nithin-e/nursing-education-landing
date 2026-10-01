@@ -17,45 +17,38 @@ export default function NewsCardItem({
 }: NewsCardItemProps) {
   const palettes = {
     light: {
-      surface:
-        'border-charcoal/10 bg-paper hover:border-gold/70 hover:shadow-[0_28px_60px_-38px_rgba(17,18,26,0.55)]',
-      title: 'text-charcoal group-hover:text-gold-dark',
+      surface: 'border-charcoal/10 bg-paper hover:border-charcoal/30',
+      title: 'text-charcoal hover:text-gold-dark',
       body: 'text-charcoal/70',
       meta: 'text-charcoal/55',
-      badge: 'bg-gold/12 text-gold-dark',
-      link: 'text-charcoal group-hover:text-gold-dark',
+      badge: 'bg-mist text-gold-dark',
+      link: 'text-charcoal hover:text-gold-dark',
     },
     dark: {
-      surface:
-        'border-white/10 bg-charcoal-soft/70 hover:border-gold/70 hover:bg-charcoal-soft hover:shadow-[0_28px_60px_-32px_rgba(0,0,0,0.9)]',
-      title: 'text-paper group-hover:text-gold',
+      surface: 'border-white/10 bg-charcoal-soft/70 hover:border-white/25',
+      title: 'text-paper hover:text-gold',
       body: 'text-grey',
       meta: 'text-grey/80',
-      badge: 'bg-gold/15 text-gold',
-      link: 'text-paper group-hover:text-gold',
+      badge: 'bg-white/10 text-gold',
+      link: 'text-paper hover:text-gold',
     },
   } as const
 
   const p = palettes[tone]
 
   return (
-    <article
-      className={cn(
-        'group flex h-full flex-col overflow-hidden rounded-2xl border transition-all duration-300 hover:-translate-y-1.5',
-        p.surface,
-      )}
-    >
+    <article className={cn('flex h-full flex-col overflow-hidden rounded-lg border transition-colors duration-200', p.surface)}>
       <div className="relative aspect-video overflow-hidden bg-charcoal">
         <SmartImage
           src={item.image}
           alt={item.imageAlt}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+          className="h-full w-full object-cover"
           width={640}
           height={420}
         />
         <span
           className={cn(
-            'absolute top-4 left-4 rounded-full px-3 py-1 text-[0.68rem] font-semibold tracking-[0.12em] uppercase',
+            'absolute top-3 left-3 rounded-md px-2 py-0.5 text-[0.65rem] font-semibold tracking-[0.08em] uppercase',
             p.badge,
           )}
         >
@@ -63,8 +56,8 @@ export default function NewsCardItem({
         </span>
       </div>
 
-      <div className="flex flex-1 flex-col gap-3 p-6">
-        <p className={cn('flex flex-wrap items-center gap-x-4 gap-y-1 text-xs', p.meta)}>
+      <div className="flex flex-1 flex-col gap-2.5 p-5 sm:p-6">
+        <p className={cn('flex flex-wrap items-center gap-x-3 gap-y-1 text-xs', p.meta)}>
           <span className="inline-flex items-center gap-1.5">
             <CalendarDays className="size-3.5" aria-hidden="true" />
             <time>{item.date}</time>
@@ -75,21 +68,15 @@ export default function NewsCardItem({
           </span>
         </p>
 
-        <h3 className={cn('text-lg transition-colors duration-300', p.title)}>{item.title}</h3>
+        <h3 className={cn('text-lg transition-colors duration-200', p.title)}>{item.title}</h3>
         <p className={cn('text-sm leading-relaxed', p.body)}>{item.description}</p>
 
         <a
           href={linkHref}
-          className={cn(
-            'mt-auto inline-flex items-center gap-1.5 pt-4 text-sm font-semibold transition-colors',
-            p.link,
-          )}
+          className={cn('mt-auto inline-flex items-center gap-1.5 pt-3 text-sm font-semibold transition-colors', p.link)}
         >
           Read More
-          <ArrowRight
-            className="size-4 transition-transform duration-300 group-hover:translate-x-1"
-            aria-hidden="true"
-          />
+          <ArrowRight className="size-4" aria-hidden="true" />
         </a>
       </div>
     </article>

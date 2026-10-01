@@ -1,6 +1,15 @@
 import type { ReactNode } from 'react'
 
+import { cn } from '@/lib/cn'
+
 type Tone = 'light' | 'dark' | 'mist'
+
+/**
+ * Vertical rhythm for the whole page. Mobile sits between 48px and 64px so
+ * consecutive sections read as one continuous document instead of separate
+ * slabs of empty space; desktop opens up to 96px for a calmer rhythm.
+ */
+const SECTION_PADDING = 'py-12 sm:py-16 lg:py-24'
 
 export const SECTION_TONES: Record<Tone, { root: string; heading: string; body: string }> = {
   light: { root: 'bg-paper text-charcoal', heading: 'text-charcoal', body: 'text-charcoal/70' },
@@ -17,7 +26,8 @@ export type SectionProps = {
 
 /**
  * Single wrapper that guarantees consistent vertical rhythm, background tone and
- * the `scroll-mt` offset required by smooth anchor navigation.
+ * the `scroll-mt` offset required by smooth anchor navigation. Sections opt into
+ * a different cadence through `className` instead of repeating padding classes.
  */
 export default function Section({
   id,
@@ -26,7 +36,7 @@ export default function Section({
   children,
 }: SectionProps) {
   return (
-    <section id={id} className={`scroll-mt-24 ${SECTION_TONES[tone].root} ${className}`}>
+    <section id={id} className={cn('scroll-mt-20', SECTION_PADDING, SECTION_TONES[tone].root, className)}>
       {children}
     </section>
   )
@@ -39,5 +49,5 @@ export function SectionBody({
   className?: string
   children: ReactNode
 }) {
-  return <div className={`container-page ${className}`}>{children}</div>
+  return <div className={cn('container-page', className)}>{children}</div>
 }
