@@ -1,23 +1,50 @@
 @import 'tailwindcss';
 
 /* ---------------------------------------------------------------------------
-   Design tokens — black #000 · charcoal #11121A · gold #FFBF00 · white #FFF
+   Design tokens — pure black base, navy surfaces, one amber accent.
+
+   Every colour, radius, font and easing used on the page is declared here so a
+   single edit re-skins the whole site. Nothing below this block hard-codes a
+   hex value.
    --------------------------------------------------------------------------- */
 @theme {
-  --color-ink: #000000;
-  --color-charcoal: #11121a;
-  --color-charcoal-soft: #1a1c26;
-  --color-charcoal-line: #2a2d3a;
-  --color-gold: #ffbf00;
-  --color-gold-dark: #b37f00;
-  --color-paper: #ffffff;
-  --color-mist: #f6f6f7;
-  --color-grey: #a3a3a3;
+  /* Colors per design system */
+  --color-ink: #000; /* base */
+  --color-ink-soft: #05070d;
+  --color-navy: #0b1220;
+  --color-navy-2: #0f172a;
 
-  --font-display: 'Manrope', ui-sans-serif, system-ui, sans-serif;
-  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  /* Accent */
+  --color-amber: #ffc107;
+  --color-amber-deep: #e0a800;
+  --vital: #34d399;
 
-  --container-page: 76rem;
+  /* Text */
+  --color-body: #fff;
+  --color-muted: #9ca3af;
+  --color-offwhite: #f5f5f0;
+
+  /* Hairlines */
+  --color-line: rgb(255 255 255 / 0.06);
+  --color-line-strong: rgb(255 255 255 / 0.1);
+  --grid-line: rgba(255, 255, 255, 0.04);
+
+  /* Type */
+  --font-display: 'Exo 2', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'DM Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Radii */
+  --radius-pill: 9999px;
+  --radius-card: 28px;
+  --radius-media: 28px;
+  --radius-field: 16px;
+
+  /* Motion */
+  --ease-brand: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Layout */
+  --container-page: 1200px;
 }
 
 /* ---------------------------------------------------------------------------
@@ -26,35 +53,46 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-    scroll-padding-top: 5rem;
+    scroll-padding-top: 6rem;
     -webkit-text-size-adjust: 100%;
+    background-color: var(--color-ink);
   }
 
   body {
-    @apply bg-paper font-sans text-charcoal antialiased;
+    @apply bg-ink font-sans text-body antialiased;
     overflow-x: hidden;
   }
 
+  /* Headings use Exo 2 with mixed weights (300 and 800) via spans if needed */
   h1,
   h2,
   h3,
   h4 {
-    @apply font-display font-semibold tracking-tight text-balance;
+    @apply font-display text-white text-balance;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
   }
 
   p {
     @apply text-pretty;
+    color: var(--color-body);
+  }
+
+  a {
+    -webkit-tap-highlight-color: transparent;
   }
 
   :focus-visible {
-    @apply outline-2 outline-offset-4 outline-gold;
+    @apply outline-2 outline-offset-4 outline-amber;
   }
 
   ::selection {
-    @apply bg-gold text-ink;
+    @apply bg-amber text-ink;
   }
 
-  /* Respect reduced-motion preferences for every animation on the page. */
+  /* Reduced motion kills every transition and animation on the page, including
+     the reveal transitions, which is why the reveal hidden state also resets. */
   @media (prefers-reduced-motion: reduce) {
     html {
       scroll-behavior: auto;
@@ -66,21 +104,26 @@
       animation-iteration-count: 1 !important;
       transition-duration: 0.001ms !important;
     }
+    [data-reveal],
+    [data-reveal-group] > [data-reveal] {
+      opacity: 1 !important;
+      transform: none !important;
+    }
   }
 }
 
 /* ---------------------------------------------------------------------------
-   Layout utilities
+   Layout + component utilities
    --------------------------------------------------------------------------- */
 
-/** Single page gutter used by every band on the site. */
+/** Single page gutter used by every band on the site: 20px on phones. */
 @utility container-page {
   width: 100%;
   margin-inline: auto;
   max-width: var(--container-page);
-  padding-inline: 1.25rem;
+  padding-inline: 20px;
 
-  @media (width >= 40rem) {
+  @media (width >= 48rem) {
     padding-inline: 2rem;
   }
   @media (width >= 80rem) {
@@ -88,16 +131,466 @@
   }
 }
 
+/** Vertical rhythm: 56px on mobile, 96px from desktop up. */
+@utility section-pad {
+  padding-block: 3.5rem;
+
+  @media (width >= 64rem) {
+    padding-block: 6rem;
+  }
+}
+
 /** Keeps media inside its container at every breakpoint. */
 @utility media-frame {
   position: relative;
   overflow: hidden;
-  border-radius: var(--radius-lg);
-  background-color: var(--color-charcoal-soft);
+  border-radius: var(--radius-media);
+  background-color: var(--color-navy);
 
   img {
     display: block;
     width: 100%;
+    height: 100%;
     object-fit: cover;
+  }
+}
+
+/** Navy card surface. Hover depth comes from glow, never from a drop shadow. */
+@utility card-navy {
+  background-color: var(--color-navy);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+}
+
+/** Lifts a card 6px and adds a soft amber glow on hover. */
+@utility card-lift {
+  transition:
+    transform 250ms var(--ease-brand),
+    border-color 250ms var(--ease-brand),
+    box-shadow 250ms var(--ease-brand);
+
+  &:hover {
+    transform: translateY(-6px);
+    border-color: rgb(255 193 7 / 0.3);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.06),
+      0 28px 60px -30px rgb(255 193 7 / 0.3);
+  }
+}
+
+/** Soft amber radial bloom, used behind hero and CTA headlines. */
+@utility glow-amber {
+  background-image: radial-gradient(
+    circle at center,
+    rgb(255 193 7 / 0.18) 0%,
+    rgb(255 193 7 / 0.07) 38%,
+    transparent 70%
+  );
+}
+
+/** Low-contrast tag pill. */
+@utility chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-pill);
+  background-color: rgb(255 255 255 / 0.06);
+  padding: 5px 12px;
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--color-body);
+  white-space: nowrap;
+}
+
+/** Frosted glass pill for the community bullet points. */
+@utility glass-pill {
+  border-radius: var(--radius-pill);
+  background-color: rgb(255 255 255 / 0.05);
+  border: 1px solid rgb(255 255 255 / 0.08);
+  backdrop-filter: blur(12px);
+}
+
+/** Amber text link whose arrow slides 4px right on hover. */
+@utility link-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-amber);
+  font-weight: 600;
+  transition: color 250ms var(--ease-brand);
+
+  & svg {
+    transition: transform 250ms var(--ease-brand);
+  }
+
+  &:hover svg {
+    transform: translateX(4px);
+  }
+
+  &:hover {
+    color: var(--color-amber-deep);
+  }
+}
+
+/** Horizontal scroll-snap track for carousels, hidden scrollbar. */
+@utility snap-row {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  /* Bleeds to the viewport edge on mobile, matching the container gutters. */
+  padding-inline: 1.25rem;
+  margin-inline: -1.25rem;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (width >= 48rem) {
+    padding-inline: 2rem;
+    margin-inline: -2rem;
+  }
+  @media (width >= 80rem) {
+    padding-inline: 2.5rem;
+    margin-inline: -2.5rem;
+  }
+}
+
+/** One slide inside a snap-row track. */
+@utility snap-item {
+  flex: 0 0 84%;
+  scroll-snap-align: start;
+  min-width: 0;
+
+  @media (width >= 40rem) {
+    flex-basis: 60%;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Scroll reveal — fade + 24px translate, 600ms, 80ms stagger per child
+   --------------------------------------------------------------------------- */
+@layer components {
+  [data-reveal],
+  [data-reveal-group] > [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 600ms var(--ease-brand),
+      transform 600ms var(--ease-brand);
+  }
+
+  html.js [data-reveal],
+  html.js [data-reveal-group] > [data-reveal] {
+    opacity: 0;
+    transform: translateY(var(--reveal-y, 24px));
+  }
+
+  html.js [data-reveal].is-visible,
+  html.js [data-reveal-group] > [data-reveal].is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Stagger is expressed with nth-child so the markup needs no per-item inline
+     style and the delay stays declarative. Covers up to 12 siblings, which is
+     more than any grid on this page. */
+  [data-reveal-stagger] > :nth-child(1) {
+    transition-delay: 0ms;
+  }
+  [data-reveal-stagger] > :nth-child(2) {
+    transition-delay: 80ms;
+  }
+  [data-reveal-stagger] > :nth-child(3) {
+    transition-delay: 160ms;
+  }
+  [data-reveal-stagger] > :nth-child(4) {
+    transition-delay: 240ms;
+  }
+  [data-reveal-stagger] > :nth-child(5) {
+    transition-delay: 320ms;
+  }
+  [data-reveal-stagger] > :nth-child(6) {
+    transition-delay: 400ms;
+  }
+  [data-reveal-stagger] > :nth-child(7) {
+    transition-delay: 480ms;
+  }
+  [data-reveal-stagger] > :nth-child(8) {
+    transition-delay: 560ms;
+  }
+  [data-reveal-stagger] > :nth-child(9) {
+    transition-delay: 640ms;
+  }
+  [data-reveal-stagger] > :nth-child(10) {
+    transition-delay: 720ms;
+  }
+  [data-reveal-stagger] > :nth-child(11) {
+    transition-delay: 800ms;
+  }
+  [data-reveal-stagger] > :nth-child(12) {
+    transition-delay: 880ms;
+  }
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .animate-fade-up {
+    animation: fade-up 700ms var(--ease-brand) both;
+  }
+
+  @keyframes marquee {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes fadeDown {
+    0% {
+      transform: translateY(0);
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(6px);
+      opacity: 0;
+    }
+  }
+
+  @keyframes ecg-draw {
+    0% {
+      stroke-dashoffset: 1;
+    }
+    25% {
+      stroke-dashoffset: 0.5;
+    }
+    50% {
+      stroke-dashoffset: 0;
+    }
+    75% {
+      stroke-dashoffset: 0.5;
+    }
+    100% {
+      stroke-dashoffset: 1;
+    }
+  }
+
+  @keyframes pulse-dot {
+    0%,
+    100% {
+      opacity: 0.45;
+      transform: scale(0.9);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.05);
+    }
+  }
+
+  @keyframes bpm-count {
+    0% {
+      content: '68';
+    }
+    25% {
+      content: '70';
+    }
+    50% {
+      content: '72';
+    }
+    75% {
+      content: '76';
+    }
+    100% {
+      content: '70';
+    }
+  }
+
+  .ecg-grid {
+    background-image:
+      linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+    background-size: 24px 24px;
+    background-position: center;
+  }
+
+  .ecg-grid-major {
+    background-image:
+      linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px),
+      linear-gradient(to right, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+    background-size: 120px 120px, 120px 120px, 24px 24px, 24px 24px;
+    background-position: center;
+  }
+
+  .pulse-dot {
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+
+  .bpm-count::after {
+    content: '70';
+    animation: bpm-count 3s ease-in-out infinite;
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* -------------------------------------------------------------------------
+     Mobile-only pass. Every rule lives inside a max-width: 768px query so
+     the desktop layout is untouched.
+     ------------------------------------------------------------------------- */
+  @media (width <= 48rem) {
+    /* Room for the fixed action bar plus the home-indicator inset. */
+    body {
+      padding-bottom: calc(4rem + env(safe-area-inset-bottom));
+    }
+
+    /* Headings and body copy sized for a 360-430px viewport. */
+    h1,
+    h2,
+    h3,
+    h4 {
+      font-size: clamp(32px, 9vw, 44px);
+      line-height: 1.1;
+    }
+
+    p {
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    /* Nothing is allowed to force a sideways scrollbar. */
+    html,
+    body {
+      overflow-x: hidden;
+      max-width: 100%;
+    }
+
+    /* Decorative clutter that only costs legibility at this width. */
+    .ecg-grid {
+      display: none;
+    }
+
+    /* Shorter, gentler scroll reveal. */
+    [data-reveal],
+    [data-reveal-group] > [data-reveal] {
+      transform: translateY(16px);
+      transition:
+        opacity 400ms var(--ease-brand),
+        transform 400ms var(--ease-brand);
+    }
+
+    [data-reveal-stagger] > :nth-child(n) {
+      transition-delay: 40ms;
+    }
+
+    /* Career path: draw the line, pop the milestones, glow the last dot. */
+    .career-path-line {
+      transition: stroke-dashoffset 2500ms var(--ease-brand);
+    }
+
+    .career-path-dot {
+      transition:
+        transform 320ms var(--ease-brand),
+        opacity 320ms var(--ease-brand);
+    }
+
+    .career-path-final-glow {
+      opacity: 0.32;
+      animation: career-final-glow 2600ms ease-in-out infinite;
+    }
+
+    .career-marquee-track {
+      animation: marquee 38s linear infinite;
+    }
+  }
+
+  @keyframes career-final-glow {
+    0%,
+    100% {
+      opacity: 0.2;
+      transform: scale(0.85);
+    }
+    50% {
+      opacity: 0.55;
+      transform: scale(1.15);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .career-path-line,
+    .career-path-dot {
+      transition: none;
+    }
+
+    .career-path-final-glow,
+    .career-marquee-track {
+      animation: none;
+    }
+  }
+
+  .section--light {
+    --text: #0a0a0a;
+    --text-muted: #4b5563;
+    --accent-on-light: #b45309;
+    --border: rgba(0, 0, 0, 0.12);
+    color: var(--text-muted);
+  }
+
+  .section--light h2,
+  .section--light h3,
+  .section--light h4 {
+    color: var(--text);
+  }
+
+  .section--light p {
+    color: var(--text-muted);
+  }
+
+  .section--light .font-mono,
+  .section--light [class*='text-amber'] {
+    color: var(--accent-on-light) !important;
+  }
+
+  .section--light .text-white {
+    color: var(--text) !important;
+  }
+
+  .section--light .text-white\/80,
+  .section--light .text-white\/70 {
+    color: var(--text-muted) !important;
+  }
+
+  .section--light .border-line,
+  .section--light .divide-line,
+  .section--light [class*='divide-white'] {
+    border-color: var(--border) !important;
+  }
+
+  .section--light .chip {
+    background-color: rgba(0, 0, 0, 0.08);
+    color: var(--text);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pulse-dot {
+      animation: none;
+    }
+    .bpm-count::after {
+      animation: none;
+    }
   }
 }

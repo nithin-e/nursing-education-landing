@@ -5,20 +5,25 @@ import { cn } from '@/lib/cn'
 type Variant = 'primary' | 'outline' | 'outlineDark' | 'ghost'
 type Size = 'sm' | 'md' | 'lg'
 
+/**
+ * Pill buttons throughout the site. Primary is a solid amber pill with a soft
+ * amber glow on hover; outline variants are transparent with a 20% white hairline.
+ */
 const base =
-  'inline-flex items-center justify-center gap-2 rounded-full font-medium whitespace-nowrap transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-4 disabled:cursor-not-allowed disabled:opacity-60'
+  'group/btn inline-flex min-h-11 items-center justify-center gap-2 rounded-pill font-semibold whitespace-nowrap transition-[background-color,border-color,color,box-shadow,transform] duration-250 ease-brand focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber disabled:cursor-not-allowed disabled:opacity-60 active:translate-y-px'
 
 const variants: Record<Variant, string> = {
-  primary: 'bg-gold text-ink hover:bg-gold-dark',
-  outline: 'border border-charcoal/25 bg-paper text-charcoal hover:border-charcoal/60',
-  outlineDark: 'border border-white/30 text-paper hover:border-gold hover:text-gold',
-  ghost: 'text-charcoal/70 hover:text-gold-dark',
+  primary:
+    'bg-amber text-ink hover:bg-amber-deep hover:shadow-[0_0_0_4px_rgb(255_193_7/0.18),0_12px_32px_-12px_rgb(255_193_7/0.55)]',
+  outline: 'border border-white/20 text-white hover:border-amber hover:text-amber',
+  outlineDark: 'border border-white/20 text-white hover:border-amber hover:text-amber',
+  ghost: 'text-body hover:text-amber',
 }
 
 const sizes: Record<Size, string> = {
-  sm: 'px-4 py-2 text-sm',
-  md: 'px-5 py-2.5 text-sm sm:px-6 sm:py-3 sm:text-base',
-  lg: 'px-6 py-3 text-[0.95rem] sm:px-7 sm:py-3.5 sm:text-base',
+  sm: 'px-6 py-2.5 text-sm',
+  md: 'px-8 py-4 text-[0.95rem]',
+  lg: 'px-8 py-4 text-base',
 }
 
 export type ButtonProps = {

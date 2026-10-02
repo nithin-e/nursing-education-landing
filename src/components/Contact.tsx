@@ -1,26 +1,11 @@
-import { useState } from 'react'
-import type { ChangeEvent, FormEvent } from 'react'
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
-import { CheckCircle2, Info, Mail, MapPin, Phone, Send } from 'lucide-react'
+import { Mail, MapPin, Phone } from 'lucide-react'
 
 import { SITE } from '@/data/site'
-import { cn } from '@/lib/cn'
 import Reveal from './ui/Reveal'
 import Section, { SectionBody } from './ui/Section'
 import SectionHeading from './ui/SectionHeading'
-
-type FormFields = {
-  name: string
-  email: string
-  subject: string
-  message: string
-}
-
-type FormErrors = Partial<Record<keyof FormFields, string>>
-
-const EMPTY: FormFields = { name: '', email: '', subject: '', message: '' }
-
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i
+import ContactForm from './ui/ContactForm'
+import EcgPulse from './ui/EcgPulse'
 
 const CONTACT_DETAILS = [
   { icon: Mail, label: 'Email', value: SITE.email, href: `mailto:${SITE.email}` },
@@ -28,87 +13,35 @@ const CONTACT_DETAILS = [
   { icon: MapPin, label: 'Location', value: SITE.location, href: undefined },
 ]
 
-/** Pure validation helper — kept outside the component so it stays easy to test. */
-function validate(fields: FormFields): FormErrors {
-  const errors: FormErrors = {}
-
-  if (!fields.name.trim()) errors.name = 'Please enter your name.'
-  else if (fields.name.trim().length < 2) errors.name = 'Name must be at least 2 characters.'
-
-  if (!fields.email.trim()) errors.email = 'Please enter your email address.'
-  else if (!EMAIL_PATTERN.test(fields.email.trim())) errors.email = 'Enter a valid email address.'
-
-  if (!fields.subject.trim()) errors.subject = 'Please add a subject.'
-
-  if (!fields.message.trim()) errors.message = 'Please enter a message.'
-  else if (fields.message.trim().length < 10)
-    errors.message = 'Message must be at least 10 characters.'
-
-  return errors
-}
-
-const fieldBase =
-  'w-full rounded-xl border bg-paper px-4 py-3 text-sm text-charcoal placeholder:text-charcoal/40 transition-colors duration-200 focus:outline-none'
-
 export default function Contact() {
-  const [fields, setFields] = useState<FormFields>(EMPTY)
-  const [errors, setErrors] = useState<FormErrors>({})
-  const [touched, setTouched] = useState(false)
-  const [success, setSuccess] = useState(false)
-  const prefersReducedMotion = useReducedMotion()
-
-  const handleChange =
-    (field: keyof FormFields) =>
-    (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setFields((previous) => ({ ...previous, [field]: event.target.value }))
-      setErrors((previous) => ({ ...previous, [field]: undefined }))
-      setSuccess(false)
-    }
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const nextErrors = validate(fields)
-    setErrors(nextErrors)
-    setTouched(true)
-    if (Object.keys(nextErrors).length === 0) {
-      setFields(EMPTY)
-      setSuccess(true)
-    }
-  }
-
-  const reset = () => {
-    setFields(EMPTY)
-    setErrors({})
-    setTouched(false)
-    setSuccess(false)
-  }
-
   return (
-    <Section id="contact" tone="dark">
+    <Section id="contact" tone="black">
       <SectionBody>
         <SectionHeading
-          tone="dark"
           align="left"
           eyebrow="Contact"
           title="Get in touch"
+          emphasis={['touch']}
           description="Questions about nursing resources, careers or collaboration? Send us a note and our team will get back to you."
         />
 
-        <div className="mt-8 grid gap-6 sm:mt-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-10">
+        <div className="mt-12 grid gap-10 lg:mt-16 lg:grid-cols-2 lg:gap-16">
           {/* Details */}
-          <Reveal className="min-w-0">
-            <div className="flex h-full flex-col gap-5 rounded-lg border border-white/10 bg-charcoal-soft/70 p-5 sm:p-7">
-              <ul className="grid gap-4">
+          <Reveal className="min-w-0 order-2 lg:order-1">
+            <div className="flex h-full flex-col gap-10">
+              <ul className="grid gap-8">
                 {CONTACT_DETAILS.map((detail) => {
                   const Icon = detail.icon
                   const content = (
                     <>
-                      <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-gold text-ink">
-                        <Icon className="size-5" aria-hidden="true" />
-                      </span>
+                      <Icon className="size-6 shrink-0 text-amber" aria-hidden="true" />
                       <span>
-                        <span className="block text-[0.8rem] font-semibold text-grey">{detail.label}</span>
-                        <span className="mt-0.5 block text-sm break-words text-paper">{detail.value}</span>
+                        <span className="block font-mono text-xs tracking-[0.15em] text-muted uppercase">
+                          {detail.label}
+                        </span>
+                        <span className="mt-2 block text-xl break-words text-white sm:text-2xl">
+                          {detail.value}
+                        </span>
                       </span>
                     </>
                   )
@@ -117,21 +50,23 @@ export default function Contact() {
                       {detail.href ? (
                         <a
                           href={detail.href}
-                          className="flex items-center gap-4 rounded-md transition-colors hover:text-gold focus-visible:text-gold"
+                          className="flex min-h-14 items-start gap-5 py-1 underline-offset-8 hover:underline transition-colors duration-200 hover:text-amber"
                         >
                           {content}
                         </a>
                       ) : (
-                        <div className="flex items-center gap-4">{content}</div>
+                        <div className="flex items-start gap-5 py-1">{content}</div>
                       )}
                     </li>
                   )
                 })}
               </ul>
 
-              <div className="mt-auto rounded-md border border-white/10 bg-ink/60 p-4">
-                <p className="text-[0.8rem] font-semibold text-gold">Response time</p>
-                <p className="mt-1.5 text-sm leading-relaxed text-grey">
+              <div className="mt-auto rounded-field border border-line bg-ink/60 p-5">
+                <p className="font-mono text-xs font-medium tracking-[0.15em] text-amber uppercase">
+                  Response time
+                </p>
+                <p className="mt-2 text-sm leading-relaxed text-body">
                   Demo content only — placeholder contact details. Typical enquiry replies are sent
                   within two working days once a support system is connected.
                 </p>
@@ -140,194 +75,21 @@ export default function Contact() {
           </Reveal>
 
           {/* Form */}
-          <Reveal delay={0.08}>
-            <form
-              onSubmit={handleSubmit}
-              noValidate
-              className="rounded-lg border border-white/10 bg-charcoal-soft/70 p-5 sm:p-8"
-            >
-              <h3 className="text-lg text-paper">Send an enquiry</h3>
-              <p className="mt-1.5 text-sm text-grey">
+          <Reveal delay={0.08} className="order-1 lg:order-2">
+            <div className="relative z-[1]">
+              <EcgPulse animate className="relative z-0 mb-6 h-20 w-full opacity-20" />
+              <h3 className="font-display text-2xl font-bold text-white">Send an enquiry</h3>
+              <p className="mt-2 text-sm text-body">
                 Fields marked with <span aria-hidden="true">*</span> are required.
               </p>
 
-              <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                <Field
-                  id="contact-name"
-                  label="Full name"
-                  required
-                  value={fields.name}
-                  error={touched ? errors.name : undefined}
-                  onChange={handleChange('name')}
-                  placeholder="Your name"
-                />
-                <Field
-                  id="contact-email"
-                  label="Email address"
-                  type="email"
-                  required
-                  value={fields.email}
-                  error={touched ? errors.email : undefined}
-                  onChange={handleChange('email')}
-                  placeholder="you@example.com"
-                />
+              <div className="mt-7">
+                <ContactForm idPrefix="contact" />
               </div>
-
-              <div className="mt-4">
-                <Field
-                  id="contact-subject"
-                  label="Subject"
-                  required
-                  value={fields.subject}
-                  error={touched ? errors.subject : undefined}
-                  onChange={handleChange('subject')}
-                  placeholder="What is your enquiry about?"
-                />
-              </div>
-
-              <div className="mt-4">
-                <Field
-                  id="contact-message"
-                  label="Message"
-                  required
-                  multiline
-                  rows={5}
-                  value={fields.message}
-                  error={touched ? errors.message : undefined}
-                  onChange={handleChange('message')}
-                  placeholder="Tell us a little more about what you need help with."
-                />
-              </div>
-
-              <div className="mt-6 flex flex-wrap items-center gap-4">
-                <button
-                  type="submit"
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-semibold text-ink transition-colors duration-200 hover:bg-gold-dark sm:text-base"
-                >
-                  Send Message
-                  <Send className="size-4" aria-hidden="true" />
-                </button>
-                <button
-                  type="button"
-                  onClick={reset}
-                  className="rounded-full px-4 py-2 text-sm font-medium text-grey transition-colors hover:text-gold"
-                >
-                  Clear form
-                </button>
-              </div>
-
-              <AnimatePresence initial={false}>
-                {success ? (
-                  <motion.div
-                    key="success"
-                    initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.3 }}
-                    role="status"
-                    className="mt-5 flex items-start gap-3 rounded-md border border-gold/40 bg-gold/10 p-4"
-                  >
-                    <CheckCircle2 className="size-5 shrink-0 text-gold" aria-hidden="true" />
-                    <p className="text-sm leading-relaxed text-paper">
-                      <span className="font-semibold">Form validated successfully.</span> This is a
-                      static demo — no message was sent or stored. Connect a backend to deliver it.
-                    </p>
-                  </motion.div>
-                ) : null}
-              </AnimatePresence>
-
-              {touched && !success && Object.keys(errors).some((key) => errors[key as keyof FormErrors]) ? (
-                <p
-                  role="alert"
-                  className="mt-5 flex items-start gap-3 rounded-md border border-red-500/40 bg-red-500/10 p-4 text-sm text-red-200"
-                >
-                  <Info className="size-5 shrink-0" aria-hidden="true" />
-                  Please correct the highlighted fields and try again.
-                </p>
-              ) : null}
-            </form>
+            </div>
           </Reveal>
         </div>
       </SectionBody>
     </Section>
-  )
-}
-
-type FieldProps = {
-  id: string
-  label: string
-  value: string
-  onChange: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void
-  error?: string
-  type?: string
-  placeholder?: string
-  required?: boolean
-  multiline?: boolean
-  rows?: number
-}
-
-function Field({
-  id,
-  label,
-  value,
-  onChange,
-  error,
-  type = 'text',
-  placeholder,
-  required,
-  multiline,
-  rows = 5,
-}: FieldProps) {
-  const errorId = `${id}-error`
-  const classes = cn(
-    fieldBase,
-    error ? 'border-red-500' : 'border-charcoal/15 focus:border-gold',
-  )
-
-  return (
-    <div className="flex flex-col">
-      <label htmlFor={id} className="mb-2 text-sm font-medium text-paper/85">
-        {label}
-        {required ? (
-          <span className="ml-1 text-gold" aria-hidden="true">
-            *
-          </span>
-        ) : null}
-      </label>
-
-      {multiline ? (
-        <textarea
-          id={id}
-          name={id}
-          rows={rows}
-          value={value}
-          onChange={onChange}
-          placeholder={placeholder}
-          required={required}
-          aria-invalid={error ? true : undefined}
-          aria-describedby={error ? errorId : undefined}
-          className={cn(classes, 'resize-y')}
-        />
-      ) : (
-        <input
-          id={id}
-          name={id}
-          type={type}
-          value={value}
-          onChange={onChange}
-          placeholder={placeholder}
-          required={required}
-          aria-invalid={error ? true : undefined}
-          aria-describedby={error ? errorId : undefined}
-          className={classes}
-        />
-      )}
-
-      {error ? (
-        <p id={errorId} className="mt-2 text-xs font-medium text-red-300">
-          {error}
-        </p>
-      ) : null}
-    </div>
   )
 }
