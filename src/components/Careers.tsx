@@ -65,7 +65,7 @@ export default function Careers() {
               className="pointer-events-none absolute inset-y-0 left-4 w-px bg-gradient-to-b from-amber via-amber/60 to-amber/10 sm:hidden"
             />
             <ul ref={tracksRef} data-reveal-group="" data-reveal-stagger="" className="grid gap-6 sm:gap-10">
-              {CAREER_TRACKS.map((track, idx) => (
+              {CAREER_TRACKS.map((track) => (
                 <li key={track.title} data-reveal="" className="relative pl-9 sm:pl-10">
                   <span className="absolute left-4 top-1.5 size-3 rounded-full bg-[var(--vital)] ring-4 ring-ink pulse-dot sm:left-0" />
                   <div className="flex flex-col gap-2">

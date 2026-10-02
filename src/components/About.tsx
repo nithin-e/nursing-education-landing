@@ -12,7 +12,7 @@ import EcgPulse from './ui/EcgPulse'
 import { ContactTrigger } from './ui/ContactModal'
 
 export default function About() {
-  const pillarsRef = useRef<HTMLUListElement>(null)
+  const pillarsRef = useRef<HTMLDivElement>(null)
   useRevealChildren(pillarsRef)
 
   return (
