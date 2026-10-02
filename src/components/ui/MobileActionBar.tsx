@@ -18,19 +18,34 @@ export default function MobileActionBar() {
     const contact = document.getElementById('contact')
     if (!hero || !contact) return
 
-    const heroObserver = new IntersectionObserver(
-      ([entry]) => setPastHero(!entry.isIntersecting),
-      { threshold: 0 },
-    )
+    /* On mobile the hero is a sticky stacked screen, so its box never actually
+       leaves the viewport and an intersection test on it would never report
+       "past". Scroll position gives the same threshold: the bar appears once
+       the hero has been read in full. */
+    let frame = 0
+    const syncHero = () => {
+      frame = 0
+      setPastHero(window.scrollY > hero.offsetHeight)
+    }
+    const onScroll = () => {
+      if (frame) return
+      frame = window.requestAnimationFrame(syncHero)
+    }
+
     const contactObserver = new IntersectionObserver(
       ([entry]) => setAtContact(entry.isIntersecting),
       { threshold: 0.15 },
     )
-
-    heroObserver.observe(hero)
     contactObserver.observe(contact)
+
+    syncHero()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
+
     return () => {
-      heroObserver.disconnect()
+      if (frame) window.cancelAnimationFrame(frame)
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
       contactObserver.disconnect()
     }
   }, [])
@@ -76,7 +91,7 @@ export default function MobileActionBar() {
 
 function cnBar(visible: boolean) {
   return [
-    'fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-black/85 backdrop-blur-md',
+    'mobile-action-bar fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-black/85 backdrop-blur-md',
     'transition-transform duration-300 ease-out md:hidden',
     visible ? 'pointer-events-auto' : 'pointer-events-none',
   ].join(' ')

@@ -19,7 +19,9 @@ export default function Exams() {
           description="Discover information about nursing examinations, licensing pathways and professional certifications."
         />
 
-        <div className="mt-12 hidden lg:flex" style={{ height: 'clamp(420px,55vh,520px)', gap: '12px' }}>
+        {/* The desktop card row is `hidden` below lg, so it must not carry its
+            own top margin on mobile or the gap reappears above the accordion. */}
+        <div className="mt-0 hidden lg:mt-12 lg:flex" style={{ height: 'clamp(420px,55vh,520px)', gap: '12px' }}>
           {EXAM_CARDS.map((card, idx) => {
             const isActive = active === idx
             const num = String(idx + 1).padStart(2, '0')
@@ -89,11 +91,13 @@ export default function Exams() {
           })}
         </div>
 
-        <div className="mt-6 flex flex-col divide-y divide-line border-t border-line lg:hidden">
+        <div className="fx-accordion mt-6 flex flex-col divide-y divide-line border-t border-line lg:hidden">
           {EXAM_CARDS.map((card, idx) => {
             const num = String(idx + 1).padStart(2, '0')
             return (
-              <details key={card.title} className="group" open={idx === 0}>
+              /* Native <details> already owns the expand/collapse, so the touch
+                 treatment only accents whichever row is open. */
+              <details key={card.title} data-fx="row" className="group" open={idx === 0}>
                 <summary className="flex min-h-[72px] cursor-pointer list-none items-center justify-between gap-3 py-3">
                   <div className="flex min-w-0 items-center gap-3">
                     <span className="font-mono text-sm tabular-nums text-amber">{num}</span>

@@ -105,7 +105,7 @@ export default function News() {
             description="A look at the themes shaping nursing education, patient care and professional events — written for our community."
           />
 
-          <div className="hidden shrink-0 items-center gap-4 sm:flex">
+          <div className="flex shrink-0 items-center gap-2 sm:gap-4">
             <div className="flex items-center gap-2 font-mono text-sm text-white/70 tabular-nums">
               <span>{String(activeIndex + 1).padStart(2, '0')}</span>
               <span>/</span>
@@ -116,7 +116,7 @@ export default function News() {
               onClick={() => scrollBy(-1)}
               disabled={atStart}
               aria-label="Previous articles"
-              className="grid size-12 place-items-center rounded-full border border-amber/40 text-amber transition-colors duration-200 hover:bg-amber hover:text-black disabled:pointer-events-none disabled:opacity-35"
+              className="grid size-11 place-items-center rounded-full border border-amber/40 text-amber transition-colors duration-200 hover:bg-amber hover:text-black disabled:pointer-events-none disabled:opacity-35 sm:size-12"
             >
               <ArrowLeft className="size-5" aria-hidden="true" />
             </button>
@@ -125,7 +125,7 @@ export default function News() {
               onClick={() => scrollBy(1)}
               disabled={atEnd}
               aria-label="Next articles"
-              className="grid size-12 place-items-center rounded-full border border-amber/40 text-amber transition-colors duration-200 hover:bg-amber hover:text-black disabled:pointer-events-none disabled:opacity-35"
+              className="grid size-11 place-items-center rounded-full border border-amber/40 text-amber transition-colors duration-200 hover:bg-amber hover:text-black disabled:pointer-events-none disabled:opacity-35 sm:size-12"
             >
               <ArrowRight className="size-5" aria-hidden="true" />
             </button>
@@ -150,8 +150,7 @@ export default function News() {
           {NEWS_ITEMS.map((item, index) => (
             <div
               key={item.title}
-              className="w-[88%] shrink-0 snap-start sm:w-[78%]"
-              style={{ height: 'clamp(420px, 60vh, 560px)' }}
+              className="h-[clamp(360px,50vh,440px)] w-[88%] shrink-0 snap-start sm:w-[78%] md:h-[clamp(420px,60vh,560px)]"
             >
               <NewsCardCinematic
                 item={item}

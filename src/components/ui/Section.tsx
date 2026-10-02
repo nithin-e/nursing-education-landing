@@ -38,7 +38,11 @@ export default function Section({
   return (
     <section
       id={id}
-      className={cn('scroll-mt-24 section-pad relative', SECTION_TONES[tone], className)}
+      className={cn(
+        'section-pad relative scroll-mt-[calc(4rem+12px+env(safe-area-inset-top))] md:scroll-mt-24',
+        SECTION_TONES[tone],
+        className,
+      )}
     >
       {(tone === 'black' || tone === 'navy') && (
         <span

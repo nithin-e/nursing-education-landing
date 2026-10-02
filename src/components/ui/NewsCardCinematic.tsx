@@ -16,8 +16,9 @@ export default function NewsCardCinematic({ item, index, isActive }: Props) {
     <article
       tabIndex={0}
       aria-label={item.title}
+      data-fx="card"
       className={cn(
-        'group relative flex h-full flex-col justify-end overflow-hidden rounded-[32px] border transition-all duration-400',
+        'fx-card group relative flex h-full flex-col justify-end overflow-hidden rounded-[32px] border transition-all duration-400',
         'outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber',
         isActive
           ? 'border-white/10 opacity-100 scale-100 hover:border-amber/40'

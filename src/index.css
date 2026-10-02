@@ -60,7 +60,9 @@
 
   body {
     @apply bg-ink font-sans text-body antialiased;
-    overflow-x: hidden;
+    /* `clip` hides sideways overflow without creating a scroll container, so
+       position: sticky keeps working. `hidden` would silently break it. */
+    overflow-x: clip;
   }
 
   /* Headings use Exo 2 with mixed weights (300 and 800) via spans if needed */
@@ -169,12 +171,17 @@
     border-color 250ms var(--ease-brand),
     box-shadow 250ms var(--ease-brand);
 
-  &:hover {
-    transform: translateY(-6px);
-    border-color: rgb(255 193 7 / 0.3);
-    box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 0.06),
-      0 28px 60px -30px rgb(255 193 7 / 0.3);
+  /* Gated on a real hover-capable pointer. Without this, tapping a card on a
+     phone leaves it stuck lifted with the amber glow, because the synthetic
+     hover never clears. Touch users get the `is-active` state instead. */
+  @media (hover: hover) {
+    &:hover {
+      transform: translateY(-6px);
+      border-color: rgb(255 193 7 / 0.3);
+      box-shadow:
+        inset 0 1px 0 rgb(255 255 255 / 0.06),
+        0 28px 60px -30px rgb(255 193 7 / 0.3);
+    }
   }
 }
 
@@ -222,12 +229,15 @@
     transition: transform 250ms var(--ease-brand);
   }
 
-  &:hover svg {
-    transform: translateX(4px);
-  }
+  /* See `card-lift`: a bare `&:hover` here would stick on touch after a tap. */
+  @media (hover: hover) {
+    &:hover svg {
+      transform: translateX(4px);
+    }
 
-  &:hover {
-    color: var(--color-amber-deep);
+    &:hover {
+      color: var(--color-amber-deep);
+    }
   }
 }
 
@@ -449,6 +459,236 @@
   }
 
   /* -------------------------------------------------------------------------
+     Mobile menu panel.
+
+     Rendered through a portal onto <body>, so it is not a descendant of the
+     header. That matters: the header sets `backdrop-filter`, which makes it a
+     containing block for `position: fixed` descendants, so a panel rendered
+     inside it would be pinned to the header box rather than the viewport.
+
+     The panel is fully opaque black. Anything less and the hero shows through
+     it, which is what made the links look like they were floating on the hero.
+
+     These rules are intentionally *not* inside the max-width query below. The
+     hamburger is `xl:hidden`, so it is reachable from 768px all the way to
+     1280px; scoping the panel to 768px would leave it unstyled across that
+     range. `xl:hidden` on the panel itself is the real upper bound, so the
+     1280px+ desktop layout is untouched.
+     ------------------------------------------------------------------------- */
+  html.menu-open,
+  html.menu-open body {
+    overflow: hidden;
+  }
+
+  /* The panel is opaque and covers the viewport, so the header stays behind it
+     and its own logo/close button are never seen. An earlier attempt to lift the
+     header above the panel with `z-index: 1001` silently did nothing: that rule
+     lives in the components layer while the header's `z-50` is a Tailwind
+     utility, and cascade layers win over specificity. Rather than force it with
+     `!important` — which would put two logos and two close buttons on screen —
+     the panel carries its own top row, and the header's toggle is hidden. */
+
+  /* Exactly one close button: the header's is taken out of the tree while open. */
+  html.menu-open .header-menu-toggle {
+    display: none;
+  }
+
+  .mobile-menu-panel {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100dvh;
+    z-index: 1000;
+    /* The 88px of top padding is what keeps the first link ("Home") clear of the
+       top row below: 88px of clearance against a 72px row, plus the safe-area
+       inset on both, so they never collide at 360px, 390px or 430px. */
+    padding: calc(env(safe-area-inset-top) + 88px) 24px calc(env(safe-area-inset-bottom) + 24px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    display: flex;
+    flex-direction: column;
+    background-color: #000;
+  }
+
+  /* Logo + close row, sitting in the panel's own top padding. Absolute so it
+     takes no layout height and cannot push the link list down. */
+  .mobile-menu-topbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: calc(72px + env(safe-area-inset-top));
+    padding: env(safe-area-inset-top) 20px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px solid rgb(255 255 255 / 0.08);
+  }
+
+  /* Nothing behind the panel may show through or stay interactive. */
+  html.menu-open .mobile-action-bar,
+  html.menu-open [data-hero-scroll-hint] {
+    display: none;
+  }
+
+  /* Pause the hero marquee rather than leaving it running behind the overlay.
+     `!important` is required: this sits in a plain layer while the
+     `animate-[marquee_...]` utility lives in the utilities layer. */
+  html.menu-open [data-hero-marquee] {
+    animation-play-state: paused !important;
+  }
+
+  /* -------------------------------------------------------------------------
+     Touch interaction effects.
+
+     `hover:` is useless on a phone — there is no hover state, and a tap can
+     leave one stuck. Tailwind v4 already wraps its `hover:` variant in
+     `@media (hover: hover)`, and the two hand-written `&:hover` blocks above are
+     now gated the same way. This block supplies the replacement: `useTouchFx`
+     adds `.is-active` to whichever `[data-fx]` element sits nearest the centre of
+     the viewport, and these rules reproduce the desktop hover look.
+
+     Every rule here is additive. The default state is the normal resting look,
+     so if the observer never runs the content is simply undecorated rather than
+     hidden.
+     ------------------------------------------------------------------------- */
+  @media (hover: none), (width <= 48rem) {
+    /* --- Nursing Resources rows ------------------------------------------- */
+    .fx-row {
+      position: relative;
+      z-index: 1;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .fx-row-fill {
+      /* Desktop animates the fill's width (`w-0` -> `group-hover:w-full`).
+         Here it is always full width and revealed by scale instead, so the two
+         mechanisms cannot fight when a touch device is wide enough to hit the
+         `lg` breakpoint. */
+      width: 100%;
+      transform: scaleX(0);
+      transform-origin: left center;
+      transition: transform 400ms var(--ease-brand);
+    }
+
+    .fx-row-title,
+    .fx-row-copy,
+    .fx-row-arrow {
+      transition:
+        color 300ms var(--ease-brand),
+        transform 300ms var(--ease-brand);
+    }
+
+    .fx-row.is-active .fx-row-fill {
+      transform: scaleX(1);
+    }
+
+    .fx-row.is-active .fx-row-title {
+      color: var(--color-ink);
+    }
+
+    .fx-row.is-active .fx-row-copy {
+      color: rgb(10 10 10 / 0.8);
+    }
+
+    .fx-row.is-active .fx-row-arrow {
+      transform: translateX(4px);
+      color: var(--color-ink);
+    }
+
+    /* --- Cards: border glow, lift, image zoom ------------------------------ */
+    .fx-card {
+      position: relative;
+      z-index: 1;
+      isolation: isolate;
+      transition:
+        border-color 250ms var(--ease-brand),
+        box-shadow 250ms var(--ease-brand);
+    }
+
+    .fx-card > img,
+    .fx-card img {
+      transition: transform 600ms var(--ease-brand);
+    }
+
+    .fx-card.is-active {
+      border-color: rgb(255 193 7 / 0.4);
+      box-shadow: 0 28px 60px -30px rgb(255 193 7 / 0.3);
+    }
+
+    .fx-card.is-active img {
+      transform: scale(1.05);
+    }
+
+    /* --- Exams accordion: the active row is the open one ------------------ */
+    .fx-accordion > summary {
+      transition:
+        background-color 250ms var(--ease-brand),
+        box-shadow 250ms var(--ease-brand);
+    }
+
+    .fx-accordion > .is-active > summary {
+      background-color: rgb(255 193 7 / 0.06);
+      box-shadow: inset 3px 0 0 var(--color-amber);
+    }
+
+    /* --- Careers timeline: dot glows amber, item shifts -------------------- */
+    .fx-timeline {
+      position: relative;
+      z-index: 1;
+      transition: transform 300ms var(--ease-brand);
+    }
+
+    .fx-dot {
+      transition:
+        background-color 300ms var(--ease-brand),
+        box-shadow 300ms var(--ease-brand);
+    }
+
+    .fx-timeline-title {
+      transition: color 300ms var(--ease-brand);
+    }
+
+    .fx-timeline.is-active {
+      transform: translateX(4px);
+    }
+
+    .fx-timeline.is-active .fx-dot {
+      background-color: var(--color-amber);
+      box-shadow: 0 0 0 4px rgb(255 193 7 / 0.18);
+    }
+
+    .fx-timeline.is-active .fx-timeline-title {
+      color: var(--color-amber);
+    }
+  }
+
+  /* Reduced motion: keep the acknowledgement, drop the movement. The amber fill
+     would otherwise be the only cue that the row is the active one. */
+  @media (prefers-reduced-motion: reduce) {
+    .fx-row-fill,
+    .fx-row.is-active .fx-row-fill {
+      transform: none;
+    }
+
+    .fx-row.is-active .fx-row-fill {
+      opacity: 0.28;
+    }
+
+    .fx-row.is-active .fx-row-arrow,
+    .fx-timeline.is-active {
+      transform: none;
+    }
+
+    .fx-card img,
+    .fx-card.is-active img {
+      transform: none;
+    }
+  }
+
+  /* -------------------------------------------------------------------------
      Mobile-only pass. Every rule lives inside a max-width: 768px query so
      the desktop layout is untouched.
      ------------------------------------------------------------------------- */
@@ -472,16 +712,12 @@
       line-height: 1.55;
     }
 
-    /* Nothing is allowed to force a sideways scrollbar. */
+    /* Nothing is allowed to force a sideways scrollbar. `clip` rather than
+       `hidden`, which would create a scroll container. */
     html,
     body {
-      overflow-x: hidden;
+      overflow-x: clip;
       max-width: 100%;
-    }
-
-    /* Decorative clutter that only costs legibility at this width. */
-    .ecg-grid {
-      display: none;
     }
 
     /* Shorter, gentler scroll reveal. */
@@ -513,8 +749,248 @@
       animation: career-final-glow 2600ms ease-in-out infinite;
     }
 
+    .hero-chevron {
+      animation: chevron-bounce 1.6s ease-in-out infinite;
+    }
+
     .career-marquee-track {
       animation: marquee 38s linear infinite;
+    }
+
+    /* ---------------------------------------------------------------------
+       Sheet reveal.
+
+       The hero is a sticky full-screen stage; every other section lives in the
+       sheet that follows it in the flow and slides up over the hero. Pure CSS,
+       so a JS failure still leaves a perfectly readable page.
+       --------------------------------------------------------------------- */
+    .stage {
+      position: sticky;
+      top: 0;
+      z-index: 0;
+      height: 100svh;
+      overflow: hidden;
+      /* The header sits above the hero in the flow; pull the stage up under it
+         so the hero starts at the very top of the first screen. */
+      margin-top: calc(-4rem - env(safe-area-inset-top));
+    }
+
+    /* The hero fills its stage; the desktop min-height is restored at md and up. */
+    .stage > #home {
+      height: 100%;
+      min-height: 0;
+    }
+
+    .sheet {
+      position: relative;
+      z-index: 2;
+      margin-top: 0;
+      background: #000;
+      border-radius: 28px 28px 0 0;
+      border-top: 1px solid rgb(255 255 255 / 0.1);
+      box-shadow: 0 -24px 60px rgb(0 0 0 / 0.6);
+      /* `clip` rounds the first section's corners off without creating a scroll
+         container, so the sticky sections inside keep working. */
+      overflow: clip;
+    }
+
+    /* Drag-handle affordance on the sheet's leading edge. */
+    .sheet::before {
+      content: '';
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      z-index: 2;
+      width: 40px;
+      height: 4px;
+      margin-left: -20px;
+      border-radius: var(--radius-pill);
+      background: rgb(255 255 255 / 0.3);
+      pointer-events: none;
+    }
+
+    /* Header clears the notch and stays above the sheet. */
+    .site-header {
+      height: auto;
+      padding-top: env(safe-area-inset-top);
+    }
+
+    /* Anchor offset is the header height plus 12px, handled by
+       scroll-margin-top on the target. Drop the extra root padding so the two
+       do not stack. */
+    html {
+      scroll-padding-top: 0;
+    }
+
+    /* Hero receding behind the sheet. Off by default so a JS failure leaves the
+       hero fully visible and static. */
+    .stage[data-stage='ready'] [data-hero-content] {
+      transform: scale(calc(1 - 0.06 * var(--stage-p, 0)));
+      opacity: calc(1 - 0.5 * var(--stage-p, 0));
+      filter: brightness(calc(1 - 0.4 * var(--stage-p, 0)));
+    }
+
+    /* Park the hero's own loops once it is out of view. */
+    .stage[data-scrolled='past'] [data-hero-marquee],
+    .stage[data-scrolled='past'] [data-hero-ecg] path {
+      animation-play-state: paused !important;
+    }
+
+    /* ---------------------------------------------------------------------
+       Normal flow.
+
+       Sticky stacking reserved roughly a viewport of scroll distance per
+       section on a phone, which is what left the black bands after the last
+       row of every section. The hook that did it is gone, so the only thing
+       left to guarantee is that each band is exactly as tall as its content.
+       --------------------------------------------------------------------- */
+    .sheet > section,
+    .sheet > footer {
+      min-height: auto;
+      height: auto;
+    }
+
+    /* Content sits above the decorative layer via `relative z-10` on the
+       wrapper in `Section`, and the vertical rhythm comes from the
+       `section-pad` utility (3.5rem = 56px below lg, 6rem from lg up) with
+       `container-page` supplying the 20px gutter. No overrides needed.
+
+       `position` is deliberately left alone on the section: `Section` sets
+       `relative` as a utility so its decorative ECG layer can bleed to the
+       band edges, and a components-layer `static` would lose to that utility
+       anyway while breaking the bleed. Nothing is pinned at this width any
+       more, because every sticky class in the tree is `lg:`-prefixed.
+
+       The ECG texture is a static gradient and cheap to paint, so it stays on
+       rather than being stripped for cost. */
+    .ecg-grid {
+      display: block;
+      opacity: 0.03;
+    }
+
+    /* Amber bloom behind section headings, matching the hero. Absolutely
+       positioned so it contributes no layout height, and negative so it paints
+       behind the static content rather than over the heading text. */
+    .section-heading-glow {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: -1;
+      display: block;
+      width: 100%;
+      height: 320px;
+      pointer-events: none;
+      background: radial-gradient(
+        70% 70% at 25% 35%,
+        rgb(255 193 7 / 0.16),
+        transparent 70%
+      );
+    }
+
+    /* The pulse line that closes a section. Decorative, so it is skipped by
+       assistive tech and never intercepts taps. */
+    .section-ecg {
+      display: block;
+      width: 100%;
+      height: 56px;
+      margin-top: 8px;
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    /* Photos stand in for the desktop hover lift: a slow settle from 1.04 once
+       the block reveals, which reads as a deliberate entrance on touch. */
+    .media-frame img,
+    .section-photo img {
+      transition: transform 700ms var(--ease-brand);
+    }
+
+    html.js [data-reveal] .media-frame img,
+    html.js [data-reveal-group] > [data-reveal] .media-frame img {
+      transform: scale(1.04);
+    }
+
+    html.js [data-reveal].is-visible .media-frame img,
+    html.js [data-reveal-group] > [data-reveal].is-visible .media-frame img {
+      transform: scale(1);
+    }
+
+    /* A banner keeps a fixed 220px crop so a portrait shot cannot inflate the
+       section. */
+    .section-photo {
+      position: relative;
+      width: 100%;
+      height: 220px;
+      margin-bottom: 20px;
+      overflow: hidden;
+      border: 1px solid var(--color-line);
+      border-radius: var(--radius-media);
+      background-color: var(--color-navy);
+    }
+
+    .section-photo img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 28%;
+    }
+
+    /* The About closing banner: 24px below the ECG line, and nothing below it,
+       so the band ends on its own 56px padding. Defined after `.section-photo`
+       so these longhands win within the same layer. Radius and border are
+       restated rather than inherited, because `--radius-media` is 28px and
+       `--color-line` is 6% white, and this banner is specced at 24px / 8%. */
+    .about-banner {
+      margin-top: 24px;
+      margin-bottom: 0;
+      height: 220px;
+      border-radius: 24px;
+      border: 1px solid rgb(255 255 255 / 0.08);
+    }
+
+    /* Corner ticks belong to the photo on every width. */
+    .section-photo::before,
+    .section-photo::after {
+      content: '';
+      position: absolute;
+      z-index: 1;
+      width: 24px;
+      height: 24px;
+      pointer-events: none;
+      border-color: rgb(255 193 7 / 0.7);
+    }
+
+    .section-photo::before {
+      top: 16px;
+      left: 16px;
+      border-top: 2px solid;
+      border-left: 2px solid;
+    }
+
+    .section-photo::after {
+      right: 16px;
+      bottom: 16px;
+      border-right: 2px solid;
+      border-bottom: 2px solid;
+    }
+
+    /* Only the footer reserves room for the fixed action bar; `body` must not
+       add the same 4rem again or the page ends with a band of dead space. */
+    body {
+      padding-bottom: 0;
+    }
+  }
+
+  @keyframes chevron-bounce {
+    0%,
+    100% {
+      transform: translateY(-2px);
+      opacity: 0.55;
+    }
+    50% {
+      transform: translateY(3px);
+      opacity: 1;
     }
   }
 
@@ -538,6 +1014,30 @@
 
     .career-path-final-glow,
     .career-marquee-track {
+      animation: none;
+    }
+
+    /* The photo settle is decoration, so it goes with the rest of the motion. */
+    .media-frame img,
+    .section-photo img {
+      transition: none;
+      transform: none;
+    }
+
+    /* Mobile menu: no fade, no slide, no per-link stagger. */
+    .mobile-menu-panel {
+      transition: none;
+      animation: none;
+    }
+
+    /* Same for the hero fade: the sheet still overlaps, it just does not dim. */
+    .stage[data-stage='ready'] [data-hero-content] {
+      transform: none;
+      opacity: 1;
+      filter: none;
+    }
+
+    .hero-chevron {
       animation: none;
     }
   }

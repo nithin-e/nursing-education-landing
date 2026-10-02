@@ -1,5 +1,5 @@
 import { ArrowRight } from 'lucide-react'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 
 import { ABOUT_PILLARS } from '@/data/nursingData'
 import { useRevealChildren } from '@/lib/useReveal'
@@ -11,6 +11,37 @@ import SmartImage from './ui/SmartImage'
 import EcgPulse from './ui/EcgPulse'
 import { ContactTrigger } from './ui/ContactModal'
 
+/**
+ * Mobile-only closing banner for the About band.
+ *
+ * Reuses the same asset as the desktop figure rather than shipping a second
+ * image, and deliberately does not use `SmartImage`: that component falls back
+ * to a placeholder and then to a text tile, both of which would leave a filled
+ * box behind. Here a failed load unmounts the wrapper entirely, so the section
+ * simply ends on its ECG line and padding instead of on an empty frame.
+ */
+function AboutBanner() {
+  const [failed, setFailed] = useState(false)
+
+  if (failed) return null
+
+  return (
+    <div className="section-photo about-banner md:hidden">
+      <img
+        src="/images/nurse-about-ward.jpg"
+        srcSet="/images/nurse-about-ward-sm.jpg 600w, /images/nurse-about-ward.jpg 1200w"
+        sizes="100vw"
+        alt="A group of nurses in scrubs talking together on a hospital ward"
+        width={1200}
+        height={900}
+        loading="lazy"
+        decoding="async"
+        onError={() => setFailed(true)}
+      />
+    </div>
+  )
+}
+
 export default function About() {
   const pillarsRef = useRef<HTMLDivElement>(null)
   useRevealChildren(pillarsRef)
@@ -18,6 +49,11 @@ export default function About() {
   return (
     <Section id="about" tone="black">
       <SectionBody>
+        {/* Amber bloom behind the heading, mobile only — the desktop layout gets
+            its warmth from the photograph instead. Absolutely positioned, so it
+            never adds height to the band. */}
+        <span aria-hidden="true" className="section-heading-glow md:hidden" />
+
         <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
           <Reveal className="min-w-0">
             <SectionHeading
@@ -41,72 +77,63 @@ export default function About() {
 
           <Reveal delay={0.1} className="relative min-w-0 lg:-mr-16">
             <figure className="relative">
-              {/* Tilted amber outline shape — desktop only, it costs width on phones. */}
-              <span
-                aria-hidden="true"
-                className="pointer-events-none absolute -inset-6 -z-10 hidden rotate-6 border-2 border-amber/40 sm:block sm:-inset-10"
-              />
-
-              {/* Mobile: a compact 200px banner with the pulse line behind it. */}
-              <div className="relative mb-5 block h-[200px] w-full overflow-hidden rounded-media border border-white/10 bg-navy sm:hidden">
+              {/* The photo is wrapped so the tilted amber outline hugs the image
+                  itself instead of the whole figure — anchored to the figure it
+                  reached down across the caption. Stacking is explicit and
+                  layered: outline 0, photo 1, caption 2. Desktop only, the
+                  outline costs width on phones. */}
+              <div className="relative">
                 <span
                   aria-hidden="true"
-                  className="pointer-events-none absolute inset-0 z-0 opacity-30"
-                >
-                  <EcgPulse animate={false} className="h-full w-full" />
-                </span>
-                <span
-                  aria-hidden="true"
-                  className="pointer-events-none absolute left-1/2 top-1/2 z-0 size-48 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(255,193,7,0.28),transparent_70%)]"
+                  className="pointer-events-none absolute -inset-6 z-0 hidden rotate-6 border-2 border-amber/40 md:block md:-inset-10"
                 />
-                <span
-                  aria-hidden="true"
-                  className="absolute left-1/2 top-1/2 z-[1] grid size-24 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-[1.5px] border-amber/50"
-                >
-                  <span aria-hidden="true" className="absolute h-[3px] w-10 rounded-full bg-amber" />
-                  <span aria-hidden="true" className="absolute h-10 w-[3px] rounded-full bg-amber" />
-                </span>
+
+                <div className="media-frame relative z-[1] hidden overflow-hidden border border-white/10 md:block">
+                  <span aria-hidden className="absolute left-4 top-4 z-[1] h-6 w-6 border-l-2 border-t-2 border-amber/70" />
+                  <span aria-hidden className="absolute bottom-4 right-4 z-[1] h-6 w-6 border-r-2 border-b-2 border-amber/70" />
+                  <SmartImage
+                    src="/images/nurse-about-ward.jpg"
+                    srcSet="/images/nurse-about-ward-sm.jpg 600w, /images/nurse-about-ward.jpg 1200w"
+                    sizes="(min-width: 1024px) 40rem, 100vw"
+                    alt="A group of nurses in scrubs talking together on a hospital ward"
+                    className="aspect-4/3 w-full [filter:saturate(0.9)_contrast(1.05)]"
+                    width={1200}
+                    height={900}
+                  />
+                </div>
               </div>
 
-              <div className="media-frame relative hidden overflow-hidden border border-white/10 sm:block">
-                <span aria-hidden className="absolute left-4 top-4 z-[1] h-6 w-6 border-l-2 border-t-2 border-amber/70" />
-                <span aria-hidden className="absolute bottom-4 right-4 z-[1] h-6 w-6 border-r-2 border-b-2 border-amber/70" />
-                <SmartImage
-                  src="/images/nurse-about-ward.jpg"
-                  srcSet="/images/nurse-about-ward-sm.jpg 600w, /images/nurse-about-ward.jpg 1200w"
-                  sizes="(min-width: 1024px) 40rem, 100vw"
-                  alt="A group of nurses in scrubs talking together on a hospital ward"
-                  className="aspect-4/3 w-full [filter:saturate(0.9)_contrast(1.05)]"
-                  width={1200}
-                  height={900}
-                />
-              </div>
+              {/* Mobile gets its photograph as a banner at the very end of the
+                  section instead — see `AboutBanner` below. Putting it here,
+                  under the heading, left the tail of the band after "Our
+                  Commitment" holding nothing but the ECG hairline and padding,
+                  which read as ~120px of dead black. */}
 
-              <blockquote className="mt-0 border-l-2 border-amber pl-4 sm:hidden">
+              <blockquote className="mt-0 border-l-2 border-amber pl-4 md:hidden">
                 <p className="text-[16px] leading-[1.55] text-white/85">
                   Nursing is a team practice — every shift depends on colleagues who share the load.
                 </p>
               </blockquote>
 
-              <figcaption className="mt-5 hidden max-w-[46ch] text-sm leading-relaxed text-muted sm:block">
+              {/* Caption sits in normal flow directly under the photo — no text
+                  is placed over the image any more. z-2 keeps it above the
+                  tilted outline; mb-16 clears the outline's rotated bottom
+                  corners before the Mission row starts. */}
+              <figcaption className="relative z-[2] mt-4 mb-16 hidden max-w-full text-[14px] leading-relaxed text-muted md:block">
                 Nursing is a team practice — every shift depends on colleagues who share the load.
               </figcaption>
             </figure>
-            {/* Heading overlapping image on desktop */}
-            <h2
-              className="absolute -bottom-16 -left-4 hidden font-display text-white lg:block"
-              style={{ fontSize: 'clamp(40px, 5vw, 64px)', lineHeight: 1.05 }}
-            >
-              Supporting the <span className="font-extrabold text-amber">future</span> of nursing
-            </h2>
           </Reveal>
         </div>
 
+        {/* `lg:mt-0` because the caption now carries the 64px of clearance via
+            `mb-16`; stacking both would open a 128px hole above Mission. Mobile
+            keeps its original `mt-8`. */}
         <div
           ref={pillarsRef}
           data-reveal-group=""
           data-reveal-stagger=""
-          className="mt-8 flex flex-col lg:mt-16"
+          className="mt-8 flex flex-col lg:mt-0"
         >
           {ABOUT_PILLARS.map((pillar, idx) => {
             const num = String(idx + 1).padStart(2, '0')
@@ -117,12 +144,14 @@ export default function About() {
                 className="group border-t border-line first:border-t-0"
               >
                 <div className="grid items-start gap-5 py-6 lg:grid-cols-[160px_1fr] lg:items-center lg:gap-12 lg:py-10">
-                  {/* Mobile: small mono number in amber. Desktop: the huge ghost numeral. */}
+                  {/* Mobile: small mono number in amber. Desktop: the huge ghost numeral.
+                      Ghost sits at z-0 and the readable number at z-1, so the
+                      numeral is always the one behind the text. */}
                   <div className="relative flex items-center justify-start">
-                    <span className="hidden font-display text-9xl font-extrabold tracking-tight text-white/5 lg:block">
+                    <span className="relative z-0 hidden font-display text-9xl font-extrabold tracking-tight text-white/5 lg:block">
                       {num}
                     </span>
-                    <span className="font-mono text-sm tabular-nums text-amber lg:absolute lg:left-2 lg:top-1/2 lg:-translate-y-1/2 lg:text-xs lg:tracking-[0.2em] lg:text-white/40">
+                    <span className="z-1 font-mono text-sm tabular-nums text-amber lg:absolute lg:left-2 lg:top-1/2 lg:-translate-y-1/2 lg:text-xs lg:tracking-[0.2em] lg:text-white/40">
                       {num}
                     </span>
                   </div>
@@ -147,6 +176,17 @@ export default function About() {
             )
           })}
         </div>
+
+        {/* Pulse line closing the band, so the section ends on content rather
+            than on empty space. */}
+        <EcgPulse animate={false} className="section-ecg mt-4 md:hidden" />
+
+        {/* Photograph closes the band below the ECG line: 220px tall, full
+            width, 24px above and nothing below, so the section then ends on
+            its own 56px bottom padding. */}
+        <Reveal y={16}>
+          <AboutBanner />
+        </Reveal>
       </SectionBody>
     </Section>
   )

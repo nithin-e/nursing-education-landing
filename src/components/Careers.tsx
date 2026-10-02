@@ -28,20 +28,19 @@ export default function Careers() {
 
         <div className="mt-6 grid gap-6 lg:mt-16 lg:grid-cols-[0.8fr_1.2fr] lg:gap-14">
           <Reveal className="min-w-0 self-start lg:sticky lg:top-24">
-            <figure className="hidden lg:block">
-              <div className="media-frame border border-white/10 relative">
-                <span aria-hidden className="absolute top-4 left-4 h-6 w-6 border-l-2 border-t-2 border-amber/70" />
-                <span aria-hidden className="absolute bottom-4 right-4 h-6 w-6 border-r-2 border-b-2 border-amber/70" />
-                <SmartImage
-                  src="/images/nurse-careers.jpg"
-                  sizes="(min-width: 1024px) 26rem, 60vw"
-                  alt="A smiling nurse in blue scrubs standing in a hospital ward"
-                  className="aspect-2/3 w-full [filter:saturate(0.9)_contrast(1.05)]"
-                  width={800}
-                  height={1200}
-                  eager
-                />
-              </div>
+            {/* One figure at every width: `.section-photo` turns it into a
+                220px banner on phones, and from md up `media-frame` plus the
+                2:3 ratio restores the tall card. The corner ticks come from
+                the `.section-photo` pseudo-elements, so none are added here. */}
+            <figure className="section-photo media-frame relative overflow-hidden border border-white/10">
+              <SmartImage
+                src="/images/nurse-careers.jpg"
+                sizes="(min-width: 1024px) 26rem, 100vw"
+                alt="A smiling nurse in blue scrubs standing in a hospital ward"
+                className="w-full [filter:saturate(0.9)_contrast(1.05)] md:aspect-2/3"
+                width={800}
+                height={1200}
+              />
             </figure>
             <CareerPathMobile />
             <blockquote className="mt-6 border-l-2 border-amber pl-5">
@@ -66,10 +65,13 @@ export default function Careers() {
             />
             <ul ref={tracksRef} data-reveal-group="" data-reveal-stagger="" className="grid gap-6 sm:gap-10">
               {CAREER_TRACKS.map((track) => (
-                <li key={track.title} data-reveal="" className="relative pl-9 sm:pl-10">
-                  <span className="absolute left-4 top-1.5 size-3 rounded-full bg-[var(--vital)] ring-4 ring-ink pulse-dot sm:left-0" />
+                <li key={track.title} data-fx="timeline" data-reveal="" className="fx-timeline relative pl-9 sm:pl-10">
+                  <span
+                    aria-hidden="true"
+                    className="fx-dot pulse-dot absolute left-4 top-1.5 size-3 rounded-full bg-[var(--vital)] ring-4 ring-ink sm:left-0"
+                  />
                   <div className="flex flex-col gap-2">
-                    <h3 className="font-display text-2xl leading-tight text-white sm:text-3xl">
+                    <h3 className="fx-timeline-title font-display text-2xl leading-tight text-white sm:text-3xl">
                       {track.title}
                     </h3>
                     <p className="max-w-[60ch] text-base text-white/80">{track.description}</p>

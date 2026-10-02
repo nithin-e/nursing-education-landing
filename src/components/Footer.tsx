@@ -21,7 +21,7 @@ export default function Footer() {
   const year = new Date().getFullYear()
 
   return (
-    <footer className="relative overflow-hidden border-t border-line-strong bg-ink text-body pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0">
+    <footer id="site-footer" className="relative overflow-hidden border-t border-line-strong bg-ink text-body pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0">
       <div className="absolute inset-x-0 top-0 flex flex-col items-center justify-center pointer-events-none z-0">
         <EcgPulse animate className="h-20 w-full opacity-15" />
         <h2
