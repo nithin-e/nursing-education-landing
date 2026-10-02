@@ -28,7 +28,9 @@ export default function Contact() {
         <div className="mt-12 grid gap-10 lg:mt-16 lg:grid-cols-2 lg:gap-16">
           {/* Details */}
           <Reveal className="min-w-0 order-2 lg:order-1">
-            <div className="flex h-full flex-col gap-10">
+            {/* `lg:h-full` + `mt-auto` stretched this column to match the form
+                on desktop; stacked on a phone that only produced dead space. */}
+            <div className="flex flex-col gap-10 lg:h-full">
               <ul className="grid gap-8">
                 {CONTACT_DETAILS.map((detail) => {
                   const Icon = detail.icon
@@ -62,7 +64,7 @@ export default function Contact() {
                 })}
               </ul>
 
-              <div className="mt-auto rounded-field border border-line bg-ink/60 p-5">
+              <div className="mt-10 rounded-field border border-line bg-ink/60 p-5 lg:mt-auto">
                 <p className="font-mono text-xs font-medium tracking-[0.15em] text-amber uppercase">
                   Response time
                 </p>

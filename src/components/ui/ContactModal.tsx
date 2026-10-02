@@ -159,7 +159,10 @@ function ContactModal({ open, onClose, sheetRef, reduced }: ModalProps) {
   return (
     <AnimatePresence>
       {open ? (
-        <div className="fixed inset-0 z-[200] md:hidden">
+        // z 1100 keeps this above the mobile menu panel (1000) and the raised
+        // header (1001), so "Contact Us" hands off cleanly from the menu instead
+        // of the sheet appearing behind the fading panel.
+        <div className="fixed inset-0 z-[1100] md:hidden">
           <motion.button
             type="button"
             aria-label="Close contact form"
@@ -229,7 +232,7 @@ function ContactModal({ open, onClose, sheetRef, reduced }: ModalProps) {
                   <button
                     type="button"
                     onClick={close}
-                    className="inline-flex min-h-[48px] w-full items-center justify-center rounded-pill bg-amber px-8 font-semibold text-ink transition-colors duration-200 hover:bg-amber-deep"
+                    className="inline-flex min-h-[48px] w-full items-center justify-center rounded-pill bg-amber px-8 font-semibold text-ink transition-[background-color,box-shadow,transform] duration-200 hover:bg-amber-deep active:scale-[0.97] active:shadow-[0_0_0_4px_rgb(255_193_7/0.28)]"
                   >
                     Close
                   </button>

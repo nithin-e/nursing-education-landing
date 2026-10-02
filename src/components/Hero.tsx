@@ -1,4 +1,4 @@
-import { ArrowRight, PlayCircle } from 'lucide-react'
+import { ArrowRight, ChevronDown, PlayCircle } from 'lucide-react'
 import type { CSSProperties } from 'react'
 
 import { HERO_STATS, HERO_TOPICS } from '@/data/nursingData'
@@ -17,7 +17,7 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="relative isolate flex min-h-[calc(100svh-3.5rem)] scroll-mt-24 flex-col overflow-hidden bg-ink text-white lg:min-h-[100svh]"
+      className="relative isolate flex flex-col overflow-hidden bg-ink text-white md:min-h-[calc(100svh-3.5rem)] md:scroll-mt-24 lg:min-h-[100svh]"
     >
       {/* Full-bleed patient-care photograph. Kept as an <img> rather than a CSS
           background so phones download a smaller file via srcSet/sizes and
@@ -43,7 +43,7 @@ export default function Hero() {
          aria-hidden="true"
          className="absolute inset-0 -z-30 ecg-grid opacity-[0.05] [mask-image:radial-gradient(ellipse_at_top,black,transparent_80%)]"
        />
-       <EcgPulse animate className="absolute top-1/4 left-0 right-0 h-24 -z-0 opacity-20" />
+       <EcgPulse animate data-hero-ecg="" className="absolute top-1/4 left-0 right-0 h-24 -z-0 opacity-20" />
        {/* Vertical wash keeps the copy legible on narrow screens and settles the
            stats strip into the bottom edge. */}
        <div
@@ -65,23 +65,27 @@ export default function Hero() {
           <span className="font-mono text-[11px] tabular-nums bpm-count text-white/90 sm:text-xs" />
           <span className="font-mono text-[9px] text-white/60 sm:text-[10px]">bpm</span>
         </div>
-        {/* Thin amber scroll indicator — hidden on phones where space is tight. */}
+        {/* Thin amber scroll indicator — desktop only, phones use the in-flow hint. */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute bottom-6 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 sm:flex"
+          data-hero-scroll-hint=""
+          className="pointer-events-none absolute bottom-6 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 md:flex"
         >
-         <span className="font-mono text-[10px] uppercase tracking-widest text-white/60">Scroll</span>
-         <div className="h-8 w-px bg-gradient-to-b from-amber to-transparent animate-[fadeDown_1.8s_ease-in-out_infinite]" />
-       </div>
+          <span className="font-mono text-[10px] uppercase tracking-widest text-white/60">Scroll</span>
+          <div className="h-8 w-px bg-gradient-to-b from-amber to-transparent animate-[fadeDown_1.8s_ease-in-out_infinite]" />
+        </div>
 
-      <div className="container-page relative z-[1] flex flex-1 flex-col justify-center py-8 sm:py-12 lg:py-24">
-        <div className="flex max-w-[46rem] flex-col items-start gap-4 sm:gap-6">
+      <div
+        data-hero-content=""
+        className="container-page relative z-[1] flex flex-1 flex-col justify-center pt-[calc(4rem+12px+env(safe-area-inset-top))] pb-3 md:py-12 lg:py-24"
+      >
+        <div className="flex max-w-[46rem] flex-col items-start gap-2.5 md:gap-6">
           <Eyebrow className="animate-fade-up" style={rise(60)}>
             Empowering nursing professionals
           </Eyebrow>
 
       <h1
-        className="animate-fade-up font-light text-white [font-size:clamp(40px,11vw,52px)] sm:[font-size:clamp(48px,9vw,120px)]"
+        className="animate-fade-up font-light text-white [font-size:clamp(30px,8.5vw,44px)] md:[font-size:clamp(48px,9vw,120px)]"
         style={{ ...rise(140), lineHeight: 1.05 }}
       >
         <span className="block">
@@ -93,7 +97,7 @@ export default function Hero() {
       </h1>
 
           <p
-            className="animate-fade-up max-w-[54ch] text-[15px] leading-[1.5] text-white/80 sm:text-lg sm:leading-relaxed"
+            className="animate-fade-up max-w-[54ch] text-[14px] leading-[1.5] text-white/80 md:text-lg md:leading-relaxed"
             style={rise(220)}
           >
             Discover nursing education, clinical resources, career opportunities and the knowledge
@@ -101,13 +105,13 @@ export default function Hero() {
           </p>
 
            <div
-             className="animate-fade-up flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center"
+             className="animate-fade-up flex w-full flex-col gap-2 md:w-auto md:flex-row md:flex-wrap md:items-center md:gap-3"
              style={rise(300)}
            >
              <Button
                href="#resources"
                size="lg"
-               className="h-[52px] w-full sm:h-auto sm:w-auto"
+               className="h-12 w-full md:h-auto md:w-auto"
              >
                Explore Nursing
                <ArrowRight className="size-4" aria-hidden="true" />
@@ -116,47 +120,66 @@ export default function Hero() {
                href="#about"
                size="lg"
                variant="outlineDark"
-               className="h-[52px] w-full sm:h-auto sm:w-auto"
+               className="h-12 w-full md:h-auto md:w-auto"
              >
                <PlayCircle className="size-4" aria-hidden="true" />
                Learn More
              </Button>
-             <ContactTrigger className="inline-flex h-[52px] w-full items-center justify-center rounded-pill border-[1.5px] border-white/30 bg-transparent px-8 font-semibold text-white transition-colors duration-200 hover:border-amber hover:text-amber sm:hidden">
+             <ContactTrigger className="inline-flex h-12 w-full items-center justify-center rounded-pill border-[1.5px] border-white/30 bg-transparent px-8 font-semibold text-white transition-colors duration-200 hover:border-amber hover:text-amber md:hidden">
                Contact Us
              </ContactTrigger>
            </div>
 
           {/* Learning areas — a horizontal row of low-contrast pills rather than a
               dot-separated sentence, so the list scans instead of reading. */}
-           <div className="animate-fade-up mt-1 w-full sm:mt-4" style={rise(380)}>
-             <h2 className="font-mono text-[10px] font-medium tracking-[0.15em] text-white/50 uppercase sm:text-xs">
+           <div className="animate-fade-up mt-0.5 w-full md:mt-4" style={rise(380)}>
+             <h2 className="font-mono text-[10px] font-medium tracking-[0.15em] text-white/50 uppercase md:text-xs">
                Popular learning areas
              </h2>
-             <div className="mt-4 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
-               <div className="flex gap-2.5 whitespace-nowrap animate-[marquee_20s_linear_infinite] will-change-transform">
+             <div className="mt-2 overflow-hidden md:mt-4 [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+               <div
+                 data-hero-marquee=""
+                 className="flex gap-2.5 whitespace-nowrap animate-[marquee_20s_linear_infinite] will-change-transform"
+               >
                  {HERO_TOPICS.concat(HERO_TOPICS).map((topic, idx) => (
-                   <span key={`${topic}-${idx}`} className="glass-pill px-4 py-2 text-sm text-white/75 shrink-0">
+                   <span
+                     key={`${topic}-${idx}`}
+                     className="glass-pill shrink-0 px-4 py-1.5 text-[13px] text-white/75 md:py-2 md:text-sm"
+                   >
                      {topic}
                    </span>
                  ))}
                </div>
              </div>
            </div>
+
+          {/* Mobile scroll hint — the desktop indicator is absolutely positioned
+              and would not fit above the stats strip on a short screen. */}
+          <div
+            aria-hidden="true"
+            data-hero-scroll-hint=""
+            className="mt-1 flex items-center gap-1.5 md:hidden"
+          >
+            <span className="font-mono text-[11px] uppercase tracking-widest text-white/60">
+              Scroll
+            </span>
+            <ChevronDown className="hero-chevron size-4 text-amber" aria-hidden="true" />
+          </div>
         </div>
       </div>
 
       {/* Trust strip — same photograph, anchored to the bottom edge of the hero. */}
-      <div className="relative z-[1] border-t border-line bg-black/40 backdrop-blur-[6px]">
+      <div className="relative z-[1] shrink-0 border-t border-line bg-black/40 backdrop-blur-[6px]">
         <div className="container-page">
-          <dl className="grid grid-cols-2 gap-x-6 gap-y-6 py-8 sm:grid-cols-4 sm:py-10">
+          <dl className="grid grid-cols-4 gap-x-2 gap-y-3 py-3 md:grid-cols-4 md:gap-y-6 md:py-10">
             {HERO_STATS.map((stat) => (
               <div key={stat.label}>
                 <dt className="sr-only">{stat.label}</dt>
                 <dd>
-                  <span className="block font-display text-3xl font-extrabold text-amber sm:text-4xl">
+                  <span className="block font-display text-xl font-extrabold text-amber md:text-4xl">
                     {stat.value}
                   </span>
-                  <span className="mt-1.5 block text-sm leading-snug text-white/70">
+                  <span className="mt-1 block text-[10px] leading-[1.3] text-white/70 md:mt-1.5 md:text-sm md:leading-snug">
                     {stat.label}
                   </span>
                 </dd>

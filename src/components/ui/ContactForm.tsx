@@ -222,7 +222,7 @@ export default function ContactForm({ idPrefix = 'contact', onSuccess }: Contact
 
       <button
         type="submit"
-        className="mt-7 inline-flex min-h-[52px] w-full items-center justify-center gap-2 rounded-pill bg-amber px-8 py-4 font-semibold text-ink transition-colors duration-200 hover:bg-amber-deep"
+           className="mt-7 inline-flex min-h-[52px] w-full items-center justify-center gap-2 rounded-pill bg-amber px-8 py-4 font-semibold text-ink transition-[background-color,box-shadow,transform] duration-200 hover:bg-amber-deep active:scale-[0.97] active:shadow-[0_0_0_4px_rgb(255_193_7/0.28)]"
       >
         Send Message
         <Send className="size-4" aria-hidden="true" />

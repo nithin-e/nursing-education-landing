@@ -11,8 +11,13 @@ import News from '@/components/News'
 import Research from '@/components/Research'
 import Resources from '@/components/Resources'
 import { ContactModalProvider } from '@/components/ui/ContactModal'
+import { useStageReveal } from '@/lib/useStageReveal'
+import useTouchFx from '@/lib/useTouchFx'
 
 export default function App() {
+  useStageReveal()
+  useTouchFx()
+
   return (
     <ContactModalProvider>
       <div className="flex min-h-screen flex-col bg-ink">
@@ -25,8 +30,13 @@ export default function App() {
 
         <Header />
 
-        <main id="main" className="flex-1">
+        {/* Mobile: the hero is pinned as a full screen and the sheet below
+            slides up over it. Both wrappers are inert above 768px. */}
+        <div className="stage">
           <Hero />
+        </div>
+
+        <main id="main" className="sheet flex-1">
           <About />
           <Resources />
           <Exams />
@@ -35,9 +45,9 @@ export default function App() {
           <News />
           <CommunityCTA />
           <Contact />
+          <Footer />
         </main>
 
-        <Footer />
         <MobileActionBar />
       </div>
     </ContactModalProvider>
