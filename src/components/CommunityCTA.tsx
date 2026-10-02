@@ -3,6 +3,9 @@ import { ArrowRight, Mail } from 'lucide-react'
 import Button from './ui/Button'
 import Reveal from './ui/Reveal'
 import Section, { SectionBody } from './ui/Section'
+import SectionHeading from './ui/SectionHeading'
+import EcgPulse from './ui/EcgPulse'
+import { ContactTrigger } from './ui/ContactModal'
 
 const COMMUNITY_POINTS = [
   'Weekly nursing learning digests',
@@ -12,41 +15,42 @@ const COMMUNITY_POINTS = [
 
 export default function CommunityCTA() {
   return (
-    <Section id="community" tone="dark" className="border-y border-charcoal-line bg-charcoal">
+    <Section id="community" tone="custom" className="relative isolate overflow-hidden bg-[#FFC107] text-black">
+      {/* Large amber bloom behind the heading. */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 -z-10 bg-[#FFC107]"
+      />
+      <EcgPulse animate className="absolute inset-x-0 top-0 h-32 -z-0 opacity-40 text-black" />
+
       <SectionBody>
-        <Reveal className="mx-auto flex max-w-3xl flex-col items-center gap-4 text-center">
-          <p className="flex items-center gap-2.5 text-[0.8rem] font-semibold text-gold">
-            <span aria-hidden="true" className="h-px w-6 shrink-0 bg-current opacity-70" />
-            Join our nursing community
-          </p>
+        <Reveal className="mx-auto flex max-w-3xl flex-col items-center text-center">
+          <SectionHeading
+            align="center"
+            eyebrow="Join our nursing community"
+            title="Be part of the nursing community"
+            emphasis={['community']}
+            description="Connect with learning resources, discover opportunities and stay informed about developments in nursing."
+            className="text-black [&>h2]:text-black [&>p]:text-black/70 [&>span]:text-black/60"
+          />
 
-          <h2 className="text-[1.6rem] leading-tight sm:text-[2rem] lg:text-[2.35rem]">
-            Be part of the nursing community
-          </h2>
-
-          <p className="max-w-[58ch] text-[0.95rem] leading-relaxed text-grey sm:text-base">
-            Connect with learning resources, discover opportunities and stay informed about
-            developments in nursing.
-          </p>
-
-          <ul className="flex flex-col gap-1.5 text-sm text-paper/80 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-x-6">
+          <ul className="mt-6 flex flex-col items-center divide-y divide-black/20 sm:flex-row sm:divide-x sm:divide-y-0 sm:gap-0">
             {COMMUNITY_POINTS.map((point) => (
-              <li key={point} className="flex items-center gap-2">
-                <span aria-hidden="true" className="size-1 rounded-full bg-gold" />
+              <li key={point} className="px-6 py-3 text-base text-black sm:py-0">
                 {point}
               </li>
             ))}
           </ul>
 
-          <div className="mt-2 flex flex-wrap items-center justify-center gap-3">
-            <Button href="#resources">
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <Button href="#resources" className="bg-black text-white hover:bg-black/90">
               Explore Resources
               <ArrowRight className="size-4" aria-hidden="true" />
             </Button>
-            <Button href="#contact" variant="outlineDark">
+            <ContactTrigger className="inline-flex min-h-14 items-center justify-center gap-2 rounded-pill border-[1.5px] border-black bg-transparent px-8 py-4 font-semibold text-black transition-colors duration-200 hover:bg-black/5">
               <Mail className="size-4" aria-hidden="true" />
               Contact Us
-            </Button>
+            </ContactTrigger>
           </div>
         </Reveal>
       </SectionBody>

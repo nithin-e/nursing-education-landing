@@ -2,19 +2,19 @@ import type { ReactNode } from 'react'
 
 import { cn } from '@/lib/cn'
 
-type Tone = 'light' | 'dark' | 'mist'
+type Tone = 'black' | 'soft' | 'navy' | 'custom'
 
 /**
- * Vertical rhythm for the whole page. Mobile sits between 48px and 64px so
- * consecutive sections read as one continuous document instead of separate
- * slabs of empty space; desktop opens up to 96px for a calmer rhythm.
+ * Vertical rhythm for the whole page: 56px top and bottom on mobile, opening up
+ * to 96px on desktop so the generous spacing reads as deliberate rather than
+ * empty. Bands alternate black, near-black and navy to separate sections without
+ * ever leaving the dark palette.
  */
-const SECTION_PADDING = 'py-12 sm:py-16 lg:py-24'
-
-export const SECTION_TONES: Record<Tone, { root: string; heading: string; body: string }> = {
-  light: { root: 'bg-paper text-charcoal', heading: 'text-charcoal', body: 'text-charcoal/70' },
-  dark: { root: 'bg-ink text-paper', heading: 'text-paper', body: 'text-grey' },
-  mist: { root: 'bg-mist text-charcoal', heading: 'text-charcoal', body: 'text-charcoal/70' },
+export const SECTION_TONES: Record<Tone, string> = {
+  black: 'bg-ink text-white',
+  soft: 'bg-ink-soft text-white',
+  navy: 'bg-navy text-white',
+  custom: '',
 }
 
 export type SectionProps = {
@@ -31,13 +31,25 @@ export type SectionProps = {
  */
 export default function Section({
   id,
-  tone = 'light',
+  tone = 'black',
   className = '',
   children,
 }: SectionProps) {
   return (
-    <section id={id} className={cn('scroll-mt-20', SECTION_PADDING, SECTION_TONES[tone].root, className)}>
-      {children}
+    <section
+      id={id}
+      className={cn('scroll-mt-24 section-pad relative', SECTION_TONES[tone], className)}
+    >
+      {(tone === 'black' || tone === 'navy') && (
+        <span
+          aria-hidden="true"
+          className="absolute inset-0 z-0 pointer-events-none ecg-grid opacity-[0.035] before:absolute before:inset-0 before:pointer-events-none before:[mask-image:radial-gradient(ellipse_at_center,black,transparent_90%)] before:content-['']"
+          style={{
+            maskImage: 'radial-gradient(ellipse at center, black, transparent 90%)',
+          }}
+        />
+      )}
+      <div className="relative z-10">{children}</div>
     </section>
   )
 }
