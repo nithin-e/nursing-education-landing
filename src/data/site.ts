@@ -1,12 +1,16 @@
 export const SITE = {
-  name: 'Nursing Insights',
-  tagline: 'Empowering Nurses. Advancing Healthcare.',
+  name: 'Dr Expert Edulinks',
+  tagline: 'Be a doctor by doctors',
   description:
-    'A nursing education and professional development platform for learning resources, clinical guidance, exam information, careers, research and community.',
-  email: 'hello@nursinginsights.example',
-  phone: '+1 (000) 000-0000',
-  location: 'Healthcare Education Hub, Your City',
+    'Nursing education and professional development platform offering learning resources, clinical guidance, exam and certification information, career pathways and research.',
+  email: 'hello@drexpert.example',
+  phone: '+91 96563 49000',
+  logo: '/images/dr-expert/logo.webp',
+  heroImage: '/images/dr-expert/hero-banner.webp',
 } as const
+
+/** `tel:` target built from the display number so the two can never drift apart. */
+export const TEL_HREF = 'tel:+919656349000'
 
 export type NavItem = {
   label: string
@@ -18,17 +22,9 @@ export const NAV_LINKS: NavItem[] = [
   { label: 'Nursing Resources', href: '#resources' },
   { label: 'Exams & Certifications', href: '#exams' },
   { label: 'Careers', href: '#careers' },
-  { label: 'Research', href: '#research' },
   { label: 'About Us', href: '#about' },
+  { label: 'Research', href: '#research' },
   { label: 'Contact', href: '#contact' },
-]
-
-export const RESOURCE_LINKS: NavItem[] = [
-  { label: 'Nursing Education', href: '#resources' },
-  { label: 'Clinical Practice', href: '#resources' },
-  { label: 'Patient Safety', href: '#resources' },
-  { label: 'Professional Development', href: '#resources' },
-  { label: 'Research & Innovation', href: '#research' },
 ]
 
 export const POLICY_LINKS: NavItem[] = [

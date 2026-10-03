@@ -1,57 +1,30 @@
-import type { ComponentType } from 'react'
-import {
-  Activity,
-  Award,
-  BookOpen,
-  Building2,
-  ClipboardCheck,
-  Compass,
-  FileBadge,
-  Globe2,
-  GraduationCap,
-  HandHeart,
-  HeartPulse,
-  Lightbulb,
-  Microscope,
-  ShieldCheck,
-  Sparkles,
-  Stethoscope,
-  Target,
-  TrendingUp,
-  Users,
-} from 'lucide-react'
+/**
+ * Every string below is text that already existed on the site, recovered from
+ * the pre-rebrand content. Nothing is invented: no statistics, testimonials,
+ * ratings, student names or university names.
+ */
 
-/** Shape shared by every icon-bearing content block on the page. */
-export type IconComponent = ComponentType<{ className?: string; strokeWidth?: number }>
-
-export type FeatureCard = {
-  icon: IconComponent
+export type ListItem = {
   title: string
-  description: string
-  points: string[]
-}
-
-export type NewsItem = {
-  category: string
-  date: string
-  readTime: string
-  title: string
-  description: string
-  image: string
-  imageAlt: string
+  summary: string
 }
 
 /* ---------------------------------------------------------------------------
-   Hero / trust strip
---------------------------------------------------------------------------- */
-export const HERO_STATS: { value: string; label: string }[] = [
-  { value: '40+', label: 'Guided learning paths' },
-  { value: '120+', label: 'Clinical topic guides' },
-  { value: '18', label: 'Career specialisations' },
-  { value: '24/7', label: 'Open resource access' },
-]
+   Home
+   --------------------------------------------------------------------------- */
+export const HERO_LABEL = 'Empowering nursing professionals'
 
-export const HERO_TOPICS: string[] = [
+export const HERO_HEADLINE = ['Empowering ', 'Nurses.']
+
+export const HERO_HEADLINE_2 = ['Advancing ', 'Healthcare.']
+
+export const HERO_TEXT =
+  'Discover nursing education, clinical resources, career opportunities and the knowledge you need to make a difference in healthcare.'
+
+/* ---------------------------------------------------------------------------
+   Ticker — the former "Popular learning areas" phrases, now a slim strip.
+   --------------------------------------------------------------------------- */
+export const TICKER_ITEMS: string[] = [
   'Nursing Fundamentals',
   'Patient Safety',
   'Clinical Skills',
@@ -64,214 +37,122 @@ export const HERO_TOPICS: string[] = [
 
 /* ---------------------------------------------------------------------------
    About
---------------------------------------------------------------------------- */
-export const ABOUT_PILLARS: FeatureCard[] = [
+   --------------------------------------------------------------------------- */
+export const ABOUT_TEXT =
+  'Explore a platform dedicated to nursing education, professional development, clinical excellence and advancing quality patient care.'
+
+export const ABOUT_ROWS: ListItem[] = [
   {
-    icon: Target,
     title: 'Our Mission',
-    description:
+    summary:
       'Make high-quality nursing knowledge approachable for every student, nurse and educator who wants to keep learning.',
-    points: ['Open educational content', 'Practical clinical guidance', 'Career-aligned learning'],
   },
   {
-    icon: Compass,
     title: 'Our Vision',
-    description:
+    summary:
       'A future where nursing practice is evidence-led, continuously improving and centred on every patient.',
-    points: ['Evidence-led practice', 'Continuous improvement', 'Patient-centred care'],
   },
   {
-    icon: HandHeart,
     title: 'Our Commitment',
-    description:
+    summary:
       'Support nurses at every stage of their career with clear, trustworthy and responsibly reviewed information.',
-    points: ['Clear explanations', 'Responsible sourcing', 'Respectful community'],
   },
 ]
 
+/** The only figures anywhere on the site. Nothing new was invented. */
+export const STATS: { value: string; label: string }[] = [
+  { value: '40+', label: 'Guided learning paths' },
+  { value: '120+', label: 'Clinical topic guides' },
+  { value: '18', label: 'Career specialisations' },
+  { value: '24/7', label: 'Open resource access' },
+]
+
 /* ---------------------------------------------------------------------------
-   Featured resources
---------------------------------------------------------------------------- */
-export const RESOURCE_CARDS: FeatureCard[] = [
+   Community banner
+   --------------------------------------------------------------------------- */
+export const COMMUNITY_TITLE = 'Be part of the nursing community'
+
+export const COMMUNITY_TEXT =
+  'Connect with learning resources, discover opportunities and stay informed about developments in nursing.'
+
+/* ---------------------------------------------------------------------------
+   Nursing resources
+   --------------------------------------------------------------------------- */
+export const RESOURCE_ITEMS: ListItem[] = [
   {
-    icon: GraduationCap,
     title: 'Nursing Education',
-    description:
-      'Learning materials, nursing fundamentals and study resources designed to build a strong clinical foundation.',
-    points: ['Anatomy & physiology', 'Nursing fundamentals', 'Study guides'],
+    summary: 'Learning materials and study resources designed to build a strong clinical foundation.',
   },
   {
-    icon: Stethoscope,
     title: 'Clinical Practice',
-    description:
-      'Practical nursing knowledge covering patient assessment, care delivery and day-to-day clinical guidance.',
-    points: ['Patient assessment', 'Care planning', 'Clinical procedures'],
+    summary: 'Practical knowledge covering patient assessment, care delivery and day-to-day guidance.',
   },
   {
-    icon: ShieldCheck,
     title: 'Patient Safety',
-    description:
-      'Infection prevention, patient safety practices and the standards that protect quality healthcare for everyone.',
-    points: ['Infection control', 'Safety protocols', 'Quality improvement'],
+    summary: 'Infection prevention, safety practices and the standards that protect quality healthcare.',
   },
   {
-    icon: TrendingUp,
     title: 'Professional Development',
-    description:
-      'Continuous learning, skills development and career growth pathways for practising nursing professionals.',
-    points: ['Specialist skills', 'Leadership', 'Career progression'],
+    summary: 'Continuous learning, skills development and career growth pathways.',
   },
 ]
 
 /* ---------------------------------------------------------------------------
    Exams & certifications
---------------------------------------------------------------------------- */
-export const EXAM_CARDS: FeatureCard[] = [
+   --------------------------------------------------------------------------- */
+export const EXAM_ITEMS: ListItem[] = [
   {
-    icon: BookOpen,
     title: 'Nursing Entrance Exams',
-    description:
-      'Overview of common entrance assessments used by nursing programmes, with preparation strategies and revision planning tips.',
-    points: ['Exam formats', 'Preparation roadmap', 'Time management tips'],
+    summary: 'Common entrance assessments used by nursing programmes, with preparation strategies.',
   },
   {
-    icon: ClipboardCheck,
     title: 'Licensing Examinations',
-    description:
-      'General information about nursing licensing examinations, application steps and what to expect after registration.',
-    points: ['Application stages', 'Test structure', 'Renewal reminders'],
+    summary: 'Information about nursing licensing examinations, application steps and registration.',
   },
   {
-    icon: Award,
     title: 'Professional Certifications',
-    description:
-      'Explore widely recognised nursing specialisation certificates and the skills each credential reflects in practice.',
-    points: ['Speciality credentials', 'Eligibility overview', 'Continuing education'],
+    summary: 'Widely recognised nursing specialisation certificates and the skills each one reflects.',
   },
 ]
 
 export const EXAM_DISCLAIMER =
   'Independent educational platform. We are not a licensing authority and do not administer, endorse or guarantee any examination or certification. Always confirm official requirements with your regulatory body.'
 
+/** Sits on the glass card over the Exams collage. */
+export const EXAM_GLASS_TEXT = 'Exam formats, application stages and renewal reminders.'
+
 /* ---------------------------------------------------------------------------
    Careers
---------------------------------------------------------------------------- */
-export const CAREER_TRACKS: FeatureCard[] = [
+   --------------------------------------------------------------------------- */
+export const CAREER_ITEMS: ListItem[] = [
   {
-    icon: HeartPulse,
     title: 'Nursing Specializations',
-    description:
-      'Compare specialities such as critical care, emergency, theatre, paediatric, community and mental health nursing.',
-    points: ['Role descriptions', 'Daily responsibilities', 'Entry focus areas'],
+    summary: 'Critical care, emergency, theatre, paediatric, community and mental health nursing.',
   },
   {
-    icon: TrendingUp,
     title: 'Career Development',
-   description:
-      'Follow progression from student nurse to advanced practice, nurse educator, management and research roles.',
-    points: ['Progression ladder', 'Leadership skills', 'Education pathways'],
+    summary: 'Progression from student nurse to advanced practice, education, management and research.',
   },
   {
-    icon: Globe2,
     title: 'International Opportunities',
-    description:
-      'Understand licensing portability, language requirements and cultural competency for nursing practice abroad.',
-    points: ['Registration basics', 'Language readiness', 'Cultural competency'],
+    summary: 'Licensing portability, language requirements and cultural competency for practice abroad.',
   },
 ]
 
 /* ---------------------------------------------------------------------------
-   Research & innovation
---------------------------------------------------------------------------- */
-export const RESEARCH_CARDS: FeatureCard[] = [
+   Research
+   --------------------------------------------------------------------------- */
+export const RESEARCH_ITEMS: ListItem[] = [
   {
-    icon: Microscope,
     title: 'Nursing Research',
-    description:
-      'How nursing research is designed, conducted and translated into better everyday patient care.',
-    points: ['Study design basics', 'Research ethics', 'Publishing guidance'],
+    summary: 'How research is designed, conducted and translated into better everyday patient care.',
   },
   {
-    icon: Activity,
     title: 'Evidence-Based Practice',
-    description:
-      'Practical methods for finding, appraising and applying the best available evidence at the bedside.',
-    points: ['Critical appraisal', 'Care protocols', 'Outcome measurement'],
+    summary: 'Finding, appraising and applying the best available evidence at the bedside.',
   },
   {
-    icon: Lightbulb,
     title: 'Healthcare Innovation',
-    description:
-      'Explore digital health, simulation, tele-nursing and redesigned models of care that shape future nursing.',
-    points: ['Digital health tools', 'Simulation training', 'Care model design'],
+    summary: 'Digital health, simulation, tele-nursing and redesigned models of care.',
   },
 ]
-
-export const RESEARCH_METHODS: { icon: IconComponent; label: string; text: string }[] = [
-  {
-    icon: ClipboardCheck,
-    label: 'Study design basics',
-    text: 'How research questions become well-structured clinical studies.',
-  },
-  {
-    icon: ShieldCheck,
-    label: 'Ethical conduct',
-    text: 'Informed consent, confidentiality and research integrity explained.',
-  },
-  {
-    icon: Users,
-    label: 'Patient partnership',
-    text: 'Including patients and families as active partners in healthcare research.',
-  },
-]
-
-/* ---------------------------------------------------------------------------
-   News — illustrative sample content only
---------------------------------------------------------------------------- */
-export const NEWS_ITEMS: NewsItem[] = [
-  {
-    category: 'Nursing Education',
-    date: 'Sample article · 12 Mar 2025',
-    readTime: '4 min read',
-    title: 'Nursing Education Updates',
-    description:
-      'An illustrative overview of how nursing curricula are shifting toward simulation, competency-based assessment and interprofessional learning.',
-    image: '/images/news-education.svg',
-    imageAlt: 'Abstract illustration representing nursing education materials',
-  },
-  {
-    category: 'Patient Care',
-    date: 'Sample article · 04 Mar 2025',
-    readTime: '5 min read',
-    title: 'Advances in Patient Care',
-    description:
-      'Sample content exploring bedside monitoring, care coordination and the measurement tools teams use to track recovery quality.',
-    image: '/images/news-patient-care.svg',
-    imageAlt: 'Abstract illustration of a heart and care-quality trend line',
-  },
-  {
-    category: 'Events',
-    date: 'Sample article · 26 Feb 2025',
-    readTime: '3 min read',
-    title: 'Nursing Events & Conferences',
-    description:
-      'A sample guide to the kinds of conferences, workshops and continuing-education events nurses can look for locally.',
-    image: '/images/news-events.svg',
-    imageAlt: 'Abstract illustration representing a nursing conference calendar',
-  },
-]
-
-export const NEWS_NOTE =
-  'The articles below are placeholder content written to demonstrate layout. They are not real news reports and should be replaced with verified, sourced material before publishing.'
-
-/* ---------------------------------------------------------------------------
-   Misc icons reused in several sections
---------------------------------------------------------------------------- */
-export const SECTION_ICONS = {
-  mission: Sparkles,
-  licensing: FileBadge,
-  certification: FileBadge,
-  hospital: Building2,
-  education: GraduationCap,
-  research: Microscope,
-} as const
