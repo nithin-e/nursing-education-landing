@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CSSProperties, KeyboardEvent } from 'react'
 import { ArrowLeft, ArrowRight, MapPin, MessageCircle } from 'lucide-react'
 
-import { getImageFallbacks, getSourceByPath } from '@/data/images'
+import { getImageFallbacks, resolvePhoto } from '@/data/images'
 import { PEOPLE } from '@/data/people'
 import type { Person } from '@/data/people'
 import Section from './ui/Section'
@@ -38,7 +38,9 @@ function PersonCard({ person, index, onMessage }: CardProps) {
 
   if (exhausted || chain.length === 0) return null
 
-  const source = getSourceByPath(chain[Math.min(step, chain.length - 1)])
+  /* Chain mixes the card's own path with bare pooled fallbacks, so normalise it
+     before reading anything off it. */
+  const source = resolvePhoto(chain[Math.min(step, chain.length - 1)]).source
   if (!source) return null
 
   const advance = () => {

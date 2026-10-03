@@ -161,4 +161,50 @@ export function getSourceByPath(src: string): Source | null {
   return SOURCES.find((item) => item.src === src) ?? null
 }
 
+/**
+ * Every shape a photo value can arrive in. A slot carries a crop, a pooled file
+ * carries only intrinsic size, and the people cards store nothing but a path —
+ * so anything reading one has to cope with all three.
+ */
+export type PhotoInput =
+  | string
+  | Source
+  | { source: Source; crop: Crop }
+  | null
+  | undefined
+
+export type ResolvedPhoto = {
+  /** The path, always present even when nothing else could be resolved. */
+  src: string
+  /** Null only when the path is not a pooled file, so no size or alt exists. */
+  source: Source | null
+  /** Null when neither the input nor the caller supplied one. */
+  crop: Crop | null
+}
+
+/**
+ * The one place a photo value is turned into something with a fixed shape.
+ *
+ * Callers hand over whatever they hold — a slot result, a pooled `Source`, or a
+ * bare path — and read `src`, `source` and `crop` back without narrowing. `crop`
+ * is the fallback for inputs that carry none, so a slot's framing survives when
+ * the chain swaps to another file.
+ */
+export function resolvePhoto(input: PhotoInput, crop: Crop | null = null): ResolvedPhoto {
+  if (typeof input === 'string') {
+    const source = getSourceByPath(input)
+    return { src: input, source, crop }
+  }
+
+  if (!input) return { src: '', source: null, crop }
+
+  /* A slot result: the crop is part of the value. */
+  if ('source' in input) {
+    return { src: input.source.src, source: input.source, crop: input.crop ?? crop }
+  }
+
+  /* A bare pooled file: intrinsic size only, so the crop comes from the caller. */
+  return { src: input.src, source: input, crop }
+}
+
 export const IMAGE_SLOT_NAMES = Object.keys(SLOTS) as ImageSlot[]

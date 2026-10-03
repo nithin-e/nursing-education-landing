@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { CSSProperties } from 'react'
 
-import { getImage, getImageFallbacks, type ImageSlot } from '@/data/images'
+import { getImage, getImageFallbacks, resolvePhoto, type ImageSlot } from '@/data/images'
 import { cn } from '@/lib/cn'
 
 export type PhotoProps = {
@@ -49,18 +49,26 @@ export default function Photo({
   if (!primary || dead) return null
 
   const chain = [primary, ...getImageFallbacks(primary.source.src)]
-  const current = chain[Math.min(step, chain.length - 1)]
+
+  /* The chain mixes a slot result with bare pooled files, so it is normalised
+     here. The slot's crop is passed as the fallback, which is what keeps the box
+     ratio and framing identical when the image swaps. */
+  const current = resolvePhoto(chain[Math.min(step, chain.length - 1)], primary.crop)
+  const source = current.source
+  const crop = current.crop ?? primary.crop
+
+  if (!source) return null
 
   return (
     <div
       className={cn('relative overflow-hidden rounded-card border border-line', className)}
-      style={useRatio ? ({ aspectRatio: current.crop.aspect } as CSSProperties) : undefined}
+      style={useRatio ? ({ aspectRatio: crop.aspect } as CSSProperties) : undefined}
     >
       <img
-        src={current.source.src}
-        alt={alt ?? current.source.alt}
-        width={current.source.width}
-        height={current.source.height}
+        src={source.src}
+        alt={alt ?? source.alt}
+        width={source.width}
+        height={source.height}
         loading={priority ? 'eager' : 'lazy'}
         decoding="async"
         onError={() => {
@@ -72,10 +80,8 @@ export default function Photo({
         }}
         className="absolute inset-0 size-full object-cover"
         style={{
-          objectPosition: current.crop.position,
-          transform: `scale(${current.crop.zoom}${
-            current.crop.flip ? ' scaleX(-1)' : ''
-          })`,
+          objectPosition: crop.position,
+          transform: `scale(${crop.zoom}${crop.flip ? ' scaleX(-1)' : ''})`,
         }}
       />
 
