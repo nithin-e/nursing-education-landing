@@ -1,4 +1,5 @@
 import { COMMUNITY_TEXT, COMMUNITY_TITLE } from '@/data/nursingData'
+import { useEnquiryModal } from './EnquiryModalProvider'
 import Button from './ui/Button'
 
 /**
@@ -7,6 +8,8 @@ import Button from './ui/Button'
  * contact section.
  */
 export default function JoinCommunity() {
+  const { openAdmission } = useEnquiryModal()
+
   return (
     <section className="section-pad bg-amber text-black">
       <div
@@ -22,7 +25,11 @@ export default function JoinCommunity() {
           </p>
         </div>
 
-        <Button href="#contact" variant="inverse" className="shrink-0">
+        <Button
+          variant="inverse"
+          className="shrink-0"
+          onClick={(event) => openAdmission(event.currentTarget)}
+        >
           Contact Us
         </Button>
       </div>

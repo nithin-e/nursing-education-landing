@@ -269,6 +269,40 @@
   }
 
   /* ------------------------------------------------------------------------
+     Enquiry dialog geometry.
+
+     Scoped to `.connect-panel` rather than overriding `.field-light` itself,
+     because the contact form shares that class and must keep its own sizing.
+     72px/18px on desktop; 56px/16px on phones, where anything under 16px makes
+     iOS Safari zoom the viewport on focus.
+     ------------------------------------------------------------------------ */
+  .connect-panel .field-light {
+    min-height: 72px;
+    border-radius: 8px;
+    font-size: 18px;
+  }
+
+  @media (width < 769px) {
+    .connect-panel .field-light {
+      min-height: 56px;
+      font-size: 16px;
+    }
+  }
+
+  .connect-panel .field-label {
+    margin-bottom: 8px;
+    font-size: 20px;
+    font-weight: 500;
+    color: #fff;
+  }
+
+  @media (width < 769px) {
+    .connect-panel .field-label {
+      font-size: 16px;
+    }
+  }
+
+  /* ------------------------------------------------------------------------
      Connect modal entrance. A fade everywhere; on a phone the panel is a
      bottom sheet, so it rises instead.
      ------------------------------------------------------------------------ */
@@ -280,7 +314,7 @@
     animation: connect-fade 220ms ease both;
   }
 
-  @media (width < 768px) {
+  @media (width < 769px) {
     .connect-panel {
       animation-name: connect-rise;
       animation-duration: 280ms;
@@ -309,10 +343,12 @@
     }
   }
 
+  /* Reduced motion still gets the opacity fade — it is the one effect that
+     causes no vestibular trouble — but never the bottom sheet's slide. */
   @media (prefers-reduced-motion: reduce) {
     .connect-backdrop,
     .connect-panel {
-      animation: none;
+      animation: connect-fade 200ms ease both;
     }
   }
 

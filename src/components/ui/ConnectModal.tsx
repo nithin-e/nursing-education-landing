@@ -10,7 +10,7 @@ import type { EnquiryPayload } from '@/lib/submitEnquiry'
 const COUNTRY_CODES = ['+91', '+1', '+44', '+971', '+966', '+974', '+61', '+65', '+81']
 
 const EDUCATION_OPTIONS = [
-  'Education...',
+  'Choose...',
   '12th Standard',
   'Nursing Student',
   'GNM',
@@ -18,6 +18,9 @@ const EDUCATION_OPTIONS = [
   'Registered Nurse',
   'Other',
 ]
+
+/** Lead source recorded when the form is opened by a "Get Admission" button. */
+const ADMISSION_SOURCE = 'get-admission'
 
 type Fields = {
   name: string
@@ -66,11 +69,23 @@ function Label({ htmlFor, children }: { htmlFor: string; children: ReactNode }) 
   )
 }
 
+/**
+ * Which copy the dialog shows.
+ *
+ * - `person`    — opened from a person card, addressed to that person.
+ * - `admission` — opened by any "Get Admission"/"Contact Us" button, so it is a
+ *   sign-up form with no addressee.
+ */
+export type ConnectModalMode = 'person' | 'admission'
+
 export type ConnectModalProps = {
-  /** Card the visitor clicked. `null` closes the modal. */
+  mode: ConnectModalMode
+  /** Whether the dialog is showing. */
+  open: boolean
+  /** Card the visitor clicked. `null` in `admission` mode. */
   personName: string | null
   /**
-   * The Message button that opened this dialog. Focus returns here on close.
+   * The button that opened this dialog. Focus returns here on close.
    * Falls back to whatever had focus, so the dialog still restores sensibly if
    * a caller forgets it.
    */
@@ -79,13 +94,19 @@ export type ConnectModalProps = {
 }
 
 /**
- * The enquiry dialog behind every "Message" button in the people carousel. One
- * instance, opened with a name, so the dialog state lives here rather than in
- * each card. Validates in the browser and hands the payload to
- * `submitEnquiry`, which is still a stub.
+ * The one enquiry dialog for the site, shared by the people carousel and every
+ * "Get Admission" button. `mode` decides the heading and the hidden lead-source
+ * field; the form itself is identical either way. Validates in the browser and
+ * hands the payload to `submitEnquiry`, which is still a stub.
  */
-export default function ConnectModal({ personName, trigger, onClose }: ConnectModalProps) {
-  const open = personName !== null
+export default function ConnectModal({
+  mode,
+  open,
+  personName,
+  trigger,
+  onClose,
+}: ConnectModalProps) {
+  const isAdmission = mode === 'admission'
 
   const [fields, setFields] = useState<Fields>(EMPTY)
   const [errors, setErrors] = useState<Errors>({})
@@ -104,7 +125,7 @@ export default function ConnectModal({ personName, trigger, onClose }: ConnectMo
     setTouched(false)
     setSubmitting(false)
     setSent(false)
-  }, [open, personName])
+  }, [open, personName, mode])
 
   /* Move focus to Name on open, and hand it back to the trigger on close. */
   useEffect(() => {
@@ -195,7 +216,10 @@ export default function ConnectModal({ personName, trigger, onClose }: ConnectMo
     setSubmitting(true)
 
     const payload: EnquiryPayload = {
-      contactPerson: personName ?? '',
+      /* Admission leads have no addressee; they are tagged by source instead so
+         the backend can tell the two entry points apart. */
+      contactPerson: isAdmission ? '' : (personName ?? ''),
+      ...(isAdmission ? { source: ADMISSION_SOURCE } : {}),
       name: fields.name.trim(),
       email: fields.email.trim(),
       countryCode: fields.countryCode,
@@ -219,27 +243,34 @@ export default function ConnectModal({ personName, trigger, onClose }: ConnectMo
 
   return (
     <div
-      className="fixed inset-0 z-[200] flex items-end justify-center md:items-center"
+      className="fixed inset-0 z-[200] flex items-end justify-center min-[769px]:items-center"
       onKeyDown={onKeyDown}
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose()
       }}
     >
       {/* Decorative dimmer. The click-to-close test lives on the container. */}
-      <div className="connect-backdrop pointer-events-none absolute inset-0 bg-black/70 backdrop-blur-[6px]" aria-hidden="true" />
+      <div className="connect-backdrop pointer-events-none absolute inset-0 bg-black/70 backdrop-blur-[4px]" aria-hidden="true" />
 
       <div
         ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby={headingId}
-        className="connect-panel relative flex max-h-[90dvh] w-[92vw] max-w-[560px] flex-col overflow-y-auto rounded-t-[28px] border border-white/8 bg-surface p-6 md:rounded-[28px] md:p-8"
+        className="connect-panel relative flex max-h-[92dvh] w-[92vw] max-w-[750px] flex-col overflow-y-auto rounded-t-[24px] bg-[#0F172A] p-6 min-[769px]:rounded-[24px] min-[769px]:p-9"
       >
+        {/* Bottom-sheet affordance on phones only; a centred dialog has no edge
+            to grab, so it would be meaningless on desktop. */}
+        <span
+          aria-hidden="true"
+          className="mx-auto mb-4 block h-1 w-11 shrink-0 rounded-full bg-white/30 min-[769px]:hidden"
+        />
+
         <button
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="absolute top-5 right-5 grid size-11 shrink-0 place-items-center rounded-full border border-white/25 text-white transition-colors duration-200 hover:border-amber hover:text-amber"
+          className="absolute top-4 right-4 grid size-11 shrink-0 place-items-center rounded-full text-white transition-colors duration-200 hover:text-amber min-[769px]:top-6 min-[769px]:right-6"
         >
           <X className="size-5" aria-hidden="true" />
         </button>
@@ -264,15 +295,24 @@ export default function ConnectModal({ personName, trigger, onClose }: ConnectMo
           </div>
         ) : (
           <>
-            <h2 id={headingId} className="font-display pr-14 text-[26px] font-bold text-white">
-              Connect with {personName}
+            <h2
+              id={headingId}
+              className="font-display pr-14 text-[26px] font-bold text-white min-[769px]:text-[34px]"
+            >
+              {isAdmission ? 'Sign up to continue' : `Connect with ${personName}`}
             </h2>
-            <p className="mt-2 text-[15px] text-muted">
-              Please fill the form to connect with {personName}
-            </p>
+            {!isAdmission ? (
+              <p className="mt-2 text-[15px] text-muted">
+                Please fill the form to connect with {personName}
+              </p>
+            ) : null}
 
-            <form onSubmit={handleSubmit} noValidate className="mt-7 flex flex-col gap-5">
-              <input type="hidden" name="contactPerson" value={personName ?? ''} />
+            <form onSubmit={handleSubmit} noValidate className="mt-7 flex flex-col gap-4 min-[769px]:gap-6">
+              {isAdmission ? (
+                <input type="hidden" name="source" value={ADMISSION_SOURCE} />
+              ) : (
+                <input type="hidden" name="contactPerson" value={personName ?? ''} />
+              )}
 
               <div>
                 <Label htmlFor="enquiry-name">Name</Label>
@@ -282,7 +322,7 @@ export default function ConnectModal({ personName, trigger, onClose }: ConnectMo
                   name="name"
                   type="text"
                   autoComplete="name"
-                  placeholder="Enter your name"
+                  placeholder="What's your name?"
                   value={fields.name}
                   onChange={handleChange('name')}
                   aria-invalid={errorFor('name') ? true : undefined}
@@ -290,7 +330,7 @@ export default function ConnectModal({ personName, trigger, onClose }: ConnectMo
                   className="field field-light"
                 />
                 {errorFor('name') ? (
-                  <p id="enquiry-name-error" className="mt-2 text-[13px] text-red-400">
+                  <p id="enquiry-name-error" className="mt-2 text-[14px] text-red-400">
                     {errorFor('name')}
                   </p>
                 ) : null}
@@ -303,7 +343,7 @@ export default function ConnectModal({ personName, trigger, onClose }: ConnectMo
                   name="email"
                   type="email"
                   autoComplete="email"
-                  placeholder="Enter your email"
+                  placeholder="What's your email address?"
                   value={fields.email}
                   onChange={handleChange('email')}
                   aria-invalid={errorFor('email') ? true : undefined}
@@ -311,7 +351,7 @@ export default function ConnectModal({ personName, trigger, onClose }: ConnectMo
                   className="field field-light"
                 />
                 {errorFor('email') ? (
-                  <p id="enquiry-email-error" className="mt-2 text-[13px] text-red-400">
+                  <p id="enquiry-email-error" className="mt-2 text-[14px] text-red-400">
                     {errorFor('email')}
                   </p>
                 ) : null}
@@ -320,7 +360,7 @@ export default function ConnectModal({ personName, trigger, onClose }: ConnectMo
               <div>
                 <Label htmlFor="enquiry-mobile">Mobile</Label>
                 <div className="flex gap-3">
-                  <div className="relative w-[124px] shrink-0">
+                  <div className="relative w-[30%] shrink-0">
                     <select
                       id="enquiry-country"
                       name="countryCode"
@@ -346,7 +386,7 @@ export default function ConnectModal({ personName, trigger, onClose }: ConnectMo
                     type="tel"
                     inputMode="numeric"
                     autoComplete="tel-national"
-                    placeholder="Enter mobile number"
+                    placeholder="Contact Number"
                     value={fields.mobile}
                     onChange={handleChange('mobile')}
                     aria-invalid={errorFor('mobile') ? true : undefined}
@@ -355,7 +395,7 @@ export default function ConnectModal({ personName, trigger, onClose }: ConnectMo
                   />
                 </div>
                 {errorFor('mobile') ? (
-                  <p id="enquiry-mobile-error" className="mt-2 text-[13px] text-red-400">
+                  <p id="enquiry-mobile-error" className="mt-2 text-[14px] text-red-400">
                     {errorFor('mobile')}
                   </p>
                 ) : null}
@@ -372,7 +412,7 @@ export default function ConnectModal({ personName, trigger, onClose }: ConnectMo
                     className="field field-light cursor-pointer pr-9 pl-4"
                   >
                     {EDUCATION_OPTIONS.map((option) => (
-                      <option key={option} value={option === 'Education...' ? '' : option}>
+                      <option key={option} value={option === 'Choose...' ? '' : option}>
                         {option}
                       </option>
                     ))}
@@ -391,7 +431,7 @@ export default function ConnectModal({ personName, trigger, onClose }: ConnectMo
                   name="place"
                   type="text"
                   autoComplete="address-level2"
-                  placeholder="Enter your place"
+                  placeholder="Your Place"
                   value={fields.place}
                   onChange={handleChange('place')}
                   aria-invalid={errorFor('place') ? true : undefined}
@@ -399,7 +439,7 @@ export default function ConnectModal({ personName, trigger, onClose }: ConnectMo
                   className="field field-light"
                 />
                 {errorFor('place') ? (
-                  <p id="enquiry-place-error" className="mt-2 text-[13px] text-red-400">
+                  <p id="enquiry-place-error" className="mt-2 text-[14px] text-red-400">
                     {errorFor('place')}
                   </p>
                 ) : null}
@@ -410,7 +450,7 @@ export default function ConnectModal({ personName, trigger, onClose }: ConnectMo
                 disabled={submitting}
                 className="inline-flex min-h-14 w-full items-center justify-center rounded-pill bg-amber px-8 font-semibold text-black transition-colors duration-200 hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {submitting ? 'Submitting...' : 'Submit'}
+                {submitting ? 'Submitting...' : isAdmission ? 'Sign up' : 'Submit'}
               </button>
             </form>
           </>

@@ -1,16 +1,13 @@
+import { EMAIL, PHONE_DISPLAY } from '@/data/contact'
+
 export const SITE = {
   name: 'Dr Expert Edulinks',
   tagline: 'Be a doctor by doctors',
-  description:
-    'Nursing education and professional development platform offering learning resources, clinical guidance, exam and certification information, career pathways and research.',
-  email: 'hello@drexpert.example',
-  phone: '+91 96563 49000',
+  email: EMAIL,
+  phone: PHONE_DISPLAY,
   logo: '/images/dr-expert/logo.webp',
   heroImage: '/images/dr-expert/hero-banner.webp',
 } as const
-
-/** `tel:` target built from the display number so the two can never drift apart. */
-export const TEL_HREF = 'tel:+919656349000'
 
 export type NavItem = {
   label: string
@@ -22,19 +19,33 @@ export const NAV_LINKS: NavItem[] = [
   { label: 'Nursing Resources', href: '#resources' },
   { label: 'Exams & Certifications', href: '#exams' },
   { label: 'Careers', href: '#careers' },
-  { label: 'About Us', href: '#about' },
   { label: 'Research', href: '#research' },
+  { label: 'About Us', href: '#about' },
   { label: 'Contact', href: '#contact' },
 ]
 
-export const POLICY_LINKS: NavItem[] = [
-  { label: 'Privacy Policy', href: '#privacy' },
-  { label: 'Terms & Conditions', href: '#terms' },
-]
+export type SocialIcon = 'facebook' | 'instagram' | 'youtube' | 'linkedin'
 
-export const SOCIAL_LINKS: NavItem[] = [
-  { label: 'Facebook', href: '#contact' },
-  { label: 'X (Twitter)', href: '#contact' },
-  { label: 'LinkedIn', href: '#contact' },
-  { label: 'YouTube', href: '#contact' },
+/** Opens in a new tab from the footer, so each href is absolute and real. */
+export const SOCIAL_LINKS: { label: string; href: string; icon: SocialIcon }[] = [
+  {
+    label: 'Facebook',
+    href: 'https://www.facebook.com/drexpertedulinks',
+    icon: 'facebook',
+  },
+  {
+    label: 'Instagram',
+    href: 'https://www.instagram.com/dr.expert_edulinks/',
+    icon: 'instagram',
+  },
+  {
+    label: 'YouTube',
+    href: 'https://www.youtube.com/@Dr.ExpertEdulinks',
+    icon: 'youtube',
+  },
+  {
+    label: 'LinkedIn',
+    href: 'https://linkedin.com/company/dr-expert-edulinks',
+    icon: 'linkedin',
+  },
 ]

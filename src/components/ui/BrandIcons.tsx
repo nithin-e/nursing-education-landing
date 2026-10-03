@@ -2,14 +2,15 @@ import type { SVGProps } from 'react'
 
 /**
  * Minimal brand glyphs. Lucide dropped third-party brand icons, so the four
- * social marks used in the footer are inlined here as original paths.
+ * social marks in the footer are inlined here as original paths.
+ *
+ * Sized entirely by the caller's `className` — the wrapper owns the 44px tap
+ * target, so no intrinsic `width`/`height` is set here.
  */
 type IconProps = SVGProps<SVGSVGElement>
 
 const base = {
   viewBox: '0 0 24 24',
-  width: 18,
-  height: 18,
   fill: 'currentColor',
   'aria-hidden': true as const,
   focusable: 'false' as const,
@@ -23,18 +24,10 @@ export function FacebookIcon(props: IconProps) {
   )
 }
 
-export function XIcon(props: IconProps) {
+export function InstagramIcon(props: IconProps) {
   return (
     <svg {...base} {...props}>
-      <path d="M17.2 3h3.3l-7.2 8.3L21.8 21h-6.4l-5-6.5L4.6 21H1.3l7.7-8.8L1.9 3h6.6l4.6 5.9zm-1.2 16h1.8L7.9 4.8H6z" />
-    </svg>
-  )
-}
-
-export function LinkedInIcon(props: IconProps) {
-  return (
-    <svg {...base} {...props}>
-      <path d="M6.9 21H3.5V9.4h3.4zM5.2 8a2 2 0 110-4 2 2 0 010 4zm15.8 13h-3.4v-5.6c0-1.4-.5-2.3-1.7-2.3-.9 0-1.5.6-1.7 1.2-.1.2-.1.5-.1.8V21H10.7V9.4H14v1.6h.05c.4-.8 1.4-1.7 3-1.7 2.2 0 4 1.4 4 4.5z" />
+      <path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 01-1.38-.9 3.7 3.7 0 01-.9-1.38c-.16-.42-.36-1.06-.41-2.23-.06-1.27-.07-1.65-.07-4.85s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16zm0 5.18a4.66 4.66 0 100 9.32 4.66 4.66 0 000-9.32zM12 15.5a3.5 3.5 0 110-7 3.5 3.5 0 010 7zm5.72-7.6a1.09 1.09 0 100 2.18 1.09 1.09 0 000-2.18z" />
     </svg>
   )
 }
@@ -47,9 +40,17 @@ export function YouTubeIcon(props: IconProps) {
   )
 }
 
+export function LinkedInIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M6.9 21H3.5V9.4h3.4zM5.2 8a1.8 1.8 0 110-3.6 1.8 1.8 0 010 3.6zM21 13.5v7.5h-3.4v-7c0-1.4-.5-2.3-1.7-2.3-.9 0-1.5.6-1.7 1.2-.1.2-.1.5-.1.8v7.3h-3.4V9.4H14v1.6h.05c.4-.8 1.4-1.7 3-1.7 2.2 0 4 1.4 4 4z" />
+    </svg>
+  )
+}
+
 export const BRAND_ICONS = {
-  Facebook: FacebookIcon,
-  'X (Twitter)': XIcon,
-  LinkedIn: LinkedInIcon,
-  YouTube: YouTubeIcon,
+  facebook: FacebookIcon,
+  instagram: InstagramIcon,
+  youtube: YouTubeIcon,
+  linkedin: LinkedInIcon,
 } as const

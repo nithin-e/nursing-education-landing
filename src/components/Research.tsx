@@ -22,7 +22,9 @@ export default function Research() {
       <ul className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {RESEARCH_ITEMS.map((item, index) => (
           <li key={item.title} data-fade="" className="card-hover rounded-card bg-slate">
-            <Photo slot={CARD_SLOTS[index]} className="w-full" />
+            {/* Top corners only, so the photo sits flush against the card's own
+                28px radius instead of floating inside it. */}
+            <Photo slot={CARD_SLOTS[index]} className="w-full !rounded-[28px_28px_0_0]" />
 
             <div className="p-6">
               <div className="flex items-center gap-2">
