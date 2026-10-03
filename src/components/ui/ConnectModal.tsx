@@ -1,0 +1,421 @@
+import { useCallback, useEffect, useRef, useState } from 'react'
+import type { ChangeEvent, FormEvent, KeyboardEvent, ReactNode } from 'react'
+import { Check, ChevronDown, X } from 'lucide-react'
+
+import { EMAIL_PATTERN } from './ContactForm'
+import submitEnquiry from '@/lib/submitEnquiry'
+import type { EnquiryPayload } from '@/lib/submitEnquiry'
+
+/** Dialling codes offered next to the number field. Codes only, no flags. */
+const COUNTRY_CODES = ['+91', '+1', '+44', '+971', '+966', '+974', '+61', '+65', '+81']
+
+const EDUCATION_OPTIONS = [
+  'Education...',
+  '12th Standard',
+  'Nursing Student',
+  'GNM',
+  'B.Sc Nursing',
+  'Registered Nurse',
+  'Other',
+]
+
+type Fields = {
+  name: string
+  email: string
+  countryCode: string
+  mobile: string
+  education: string
+  place: string
+}
+
+type FieldKey = keyof Fields
+
+type Errors = Partial<Record<FieldKey, string>>
+
+const EMPTY: Fields = { name: '', email: '', countryCode: '+91', mobile: '', education: '', place: '' }
+
+/** 10 digits for India; looser elsewhere because codes differ in length. */
+function validate(fields: Fields): Errors {
+  const errors: Errors = {}
+  const digits = fields.mobile.replace(/\D/g, '')
+
+  if (!fields.name.trim()) errors.name = 'Please enter your name.'
+  else if (fields.name.trim().length < 2) errors.name = 'Name must be at least 2 characters.'
+
+  if (!fields.email.trim()) errors.email = 'Please enter your email address.'
+  else if (!EMAIL_PATTERN.test(fields.email.trim())) errors.email = 'Enter a valid email address.'
+
+  if (!digits) errors.mobile = 'Please enter your mobile number.'
+  else if (fields.countryCode === '+91' && digits.length !== 10)
+    errors.mobile = 'Enter a 10-digit mobile number.'
+  else if (digits.length < 6 || digits.length > 15) errors.mobile = 'Enter a valid mobile number.'
+
+  if (!fields.place.trim()) errors.place = 'Please enter your place.'
+
+  return errors
+}
+
+const FOCUSABLE =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled])'
+
+function Label({ htmlFor, children }: { htmlFor: string; children: ReactNode }) {
+  return (
+    <label htmlFor={htmlFor} className="field-label">
+      {children}
+    </label>
+  )
+}
+
+export type ConnectModalProps = {
+  /** Card the visitor clicked. `null` closes the modal. */
+  personName: string | null
+  /**
+   * The Message button that opened this dialog. Focus returns here on close.
+   * Falls back to whatever had focus, so the dialog still restores sensibly if
+   * a caller forgets it.
+   */
+  trigger?: HTMLButtonElement | null
+  onClose: () => void
+}
+
+/**
+ * The enquiry dialog behind every "Message" button in the people carousel. One
+ * instance, opened with a name, so the dialog state lives here rather than in
+ * each card. Validates in the browser and hands the payload to
+ * `submitEnquiry`, which is still a stub.
+ */
+export default function ConnectModal({ personName, trigger, onClose }: ConnectModalProps) {
+  const open = personName !== null
+
+  const [fields, setFields] = useState<Fields>(EMPTY)
+  const [errors, setErrors] = useState<Errors>({})
+  const [touched, setTouched] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [sent, setSent] = useState(false)
+
+  const panelRef = useRef<HTMLDivElement>(null)
+  const nameRef = useRef<HTMLInputElement>(null)
+
+  /* Fresh form each time it opens. */
+  useEffect(() => {
+    if (!open) return
+    setFields(EMPTY)
+    setErrors({})
+    setTouched(false)
+    setSubmitting(false)
+    setSent(false)
+  }, [open, personName])
+
+  /* Move focus to Name on open, and hand it back to the trigger on close. */
+  useEffect(() => {
+    if (!open) return
+
+    /* Captured now: at cleanup time activeElement is inside the dialog, which
+       is about to be removed. */
+    const restore = trigger ?? (document.activeElement as HTMLElement | null)
+    const timer = window.setTimeout(() => nameRef.current?.focus(), 0)
+
+    return () => {
+      window.clearTimeout(timer)
+      restore?.focus?.()
+    }
+  }, [open, trigger])
+
+  /* Lock page scroll for as long as the dialog is up. */
+  useEffect(() => {
+    if (!open) return
+
+    const previous = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      document.body.style.overflow = previous
+    }
+  }, [open])
+
+  /* Escape closes; Tab is trapped inside the panel. */
+  const onKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLDivElement>) => {
+      if (event.key === 'Escape') {
+        event.stopPropagation()
+        onClose()
+        return
+      }
+
+      if (event.key !== 'Tab') return
+
+      const panel = panelRef.current
+      if (!panel) return
+
+      const items = Array.from(panel.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(
+        (element) => element.offsetWidth > 0 || element.offsetHeight > 0,
+      )
+      if (items.length === 0) return
+
+      const first = items[0]
+      const last = items[items.length - 1]
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault()
+        last.focus()
+        return
+      }
+
+      if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first.focus()
+      }
+    },
+    [onClose],
+  )
+
+  const handleChange =
+    (field: FieldKey) =>
+    (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      setFields((previous) => ({ ...previous, [field]: event.target.value }))
+      setErrors((previous) => ({ ...previous, [field]: undefined }))
+      setSent(false)
+    }
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    const nextErrors = validate(fields)
+    setErrors(nextErrors)
+    setTouched(true)
+
+    if (Object.keys(nextErrors).length > 0) {
+      const firstBad = (['name', 'email', 'mobile', 'place'] as FieldKey[]).find(
+        (key) => nextErrors[key],
+      )
+      if (firstBad) panelRef.current?.querySelector<HTMLElement>(`#enquiry-${firstBad}`)?.focus()
+      return
+    }
+
+    setSubmitting(true)
+
+    const payload: EnquiryPayload = {
+      contactPerson: personName ?? '',
+      name: fields.name.trim(),
+      email: fields.email.trim(),
+      countryCode: fields.countryCode,
+      mobile: fields.mobile.replace(/\D/g, ''),
+      education: fields.education,
+      place: fields.place.trim(),
+    }
+
+    try {
+      await submitEnquiry(payload)
+      setSent(true)
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  if (!open) return null
+
+  const headingId = 'connect-modal-heading'
+  const errorFor = (key: FieldKey) => (touched ? errors[key] : undefined)
+
+  return (
+    <div
+      className="fixed inset-0 z-[200] flex items-end justify-center md:items-center"
+      onKeyDown={onKeyDown}
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) onClose()
+      }}
+    >
+      {/* Decorative dimmer. The click-to-close test lives on the container. */}
+      <div className="connect-backdrop pointer-events-none absolute inset-0 bg-black/70 backdrop-blur-[6px]" aria-hidden="true" />
+
+      <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={headingId}
+        className="connect-panel relative flex max-h-[90dvh] w-[92vw] max-w-[560px] flex-col overflow-y-auto rounded-t-[28px] border border-white/8 bg-surface p-6 md:rounded-[28px] md:p-8"
+      >
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close"
+          className="absolute top-5 right-5 grid size-11 shrink-0 place-items-center rounded-full border border-white/25 text-white transition-colors duration-200 hover:border-amber hover:text-amber"
+        >
+          <X className="size-5" aria-hidden="true" />
+        </button>
+
+        {sent ? (
+          <div className="flex flex-col items-center py-6 text-center">
+            <span className="grid size-16 place-items-center rounded-full bg-amber/15 text-amber">
+              <Check className="size-8" aria-hidden="true" strokeWidth={2.5} />
+            </span>
+
+            <h2 id={headingId} className="mt-6 font-display text-[26px] font-bold text-white">
+              Thank you. We will contact you soon.
+            </h2>
+
+            <button
+              type="button"
+              onClick={onClose}
+              className="mt-8 inline-flex min-h-14 items-center justify-center rounded-pill bg-amber px-8 font-semibold text-black transition-colors duration-200 hover:bg-white"
+            >
+              Close
+            </button>
+          </div>
+        ) : (
+          <>
+            <h2 id={headingId} className="font-display pr-14 text-[26px] font-bold text-white">
+              Connect with {personName}
+            </h2>
+            <p className="mt-2 text-[15px] text-muted">
+              Please fill the form to connect with {personName}
+            </p>
+
+            <form onSubmit={handleSubmit} noValidate className="mt-7 flex flex-col gap-5">
+              <input type="hidden" name="contactPerson" value={personName ?? ''} />
+
+              <div>
+                <Label htmlFor="enquiry-name">Name</Label>
+                <input
+                  ref={nameRef}
+                  id="enquiry-name"
+                  name="name"
+                  type="text"
+                  autoComplete="name"
+                  placeholder="Enter your name"
+                  value={fields.name}
+                  onChange={handleChange('name')}
+                  aria-invalid={errorFor('name') ? true : undefined}
+                  aria-describedby={errorFor('name') ? 'enquiry-name-error' : undefined}
+                  className="field field-light"
+                />
+                {errorFor('name') ? (
+                  <p id="enquiry-name-error" className="mt-2 text-[13px] text-red-400">
+                    {errorFor('name')}
+                  </p>
+                ) : null}
+              </div>
+
+              <div>
+                <Label htmlFor="enquiry-email">Email</Label>
+                <input
+                  id="enquiry-email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="Enter your email"
+                  value={fields.email}
+                  onChange={handleChange('email')}
+                  aria-invalid={errorFor('email') ? true : undefined}
+                  aria-describedby={errorFor('email') ? 'enquiry-email-error' : undefined}
+                  className="field field-light"
+                />
+                {errorFor('email') ? (
+                  <p id="enquiry-email-error" className="mt-2 text-[13px] text-red-400">
+                    {errorFor('email')}
+                  </p>
+                ) : null}
+              </div>
+
+              <div>
+                <Label htmlFor="enquiry-mobile">Mobile</Label>
+                <div className="flex gap-3">
+                  <div className="relative w-[124px] shrink-0">
+                    <select
+                      id="enquiry-country"
+                      name="countryCode"
+                      value={fields.countryCode}
+                      onChange={handleChange('countryCode')}
+                      className="field field-light cursor-pointer pr-9 pl-4"
+                    >
+                      {COUNTRY_CODES.map((code) => (
+                        <option key={code} value={code}>
+                          {code}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown
+                      className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-[#6B7280]"
+                      aria-hidden="true"
+                    />
+                  </div>
+
+                  <input
+                    id="enquiry-mobile"
+                    name="mobile"
+                    type="tel"
+                    inputMode="numeric"
+                    autoComplete="tel-national"
+                    placeholder="Enter mobile number"
+                    value={fields.mobile}
+                    onChange={handleChange('mobile')}
+                    aria-invalid={errorFor('mobile') ? true : undefined}
+                    aria-describedby={errorFor('mobile') ? 'enquiry-mobile-error' : undefined}
+                    className="field field-light"
+                  />
+                </div>
+                {errorFor('mobile') ? (
+                  <p id="enquiry-mobile-error" className="mt-2 text-[13px] text-red-400">
+                    {errorFor('mobile')}
+                  </p>
+                ) : null}
+              </div>
+
+              <div>
+                <Label htmlFor="enquiry-education">Education</Label>
+                <div className="relative">
+                  <select
+                    id="enquiry-education"
+                    name="education"
+                    value={fields.education}
+                    onChange={handleChange('education')}
+                    className="field field-light cursor-pointer pr-9 pl-4"
+                  >
+                    {EDUCATION_OPTIONS.map((option) => (
+                      <option key={option} value={option === 'Education...' ? '' : option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown
+                    className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-[#6B7280]"
+                    aria-hidden="true"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="enquiry-place">Place</Label>
+                <input
+                  id="enquiry-place"
+                  name="place"
+                  type="text"
+                  autoComplete="address-level2"
+                  placeholder="Enter your place"
+                  value={fields.place}
+                  onChange={handleChange('place')}
+                  aria-invalid={errorFor('place') ? true : undefined}
+                  aria-describedby={errorFor('place') ? 'enquiry-place-error' : undefined}
+                  className="field field-light"
+                />
+                {errorFor('place') ? (
+                  <p id="enquiry-place-error" className="mt-2 text-[13px] text-red-400">
+                    {errorFor('place')}
+                  </p>
+                ) : null}
+              </div>
+
+              <button
+                type="submit"
+                disabled={submitting}
+                className="inline-flex min-h-14 w-full items-center justify-center rounded-pill bg-amber px-8 font-semibold text-black transition-colors duration-200 hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {submitting ? 'Submitting...' : 'Submit'}
+              </button>
+            </form>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}

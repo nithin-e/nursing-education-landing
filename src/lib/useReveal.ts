@@ -1,104 +1,46 @@
-import { useEffect } from 'react'
-import type { RefObject } from 'react'
-
 /**
- * Scroll-reveal engine. One IntersectionObserver is shared per root element, so
- * a page with dozens of cards still costs a single observer and no scroll
- * listeners.
+ * The site's only scroll behaviour: a 300ms opacity fade on `[data-fade]`
+ * elements. No transforms, no stagger, no pinning.
  *
- * Elements start hidden through CSS (`[data-reveal]`); this module only ever
- * adds the `is-visible` class. That keeps the hidden state declarative and means
- * the `prefers-reduced-motion` override in index.css can win outright.
+ * Blocks are hidden only while `<html>` carries the `js` class, so the page is
+ * fully visible when JavaScript is off. A single timer is the backstop for the
+ * case where JS runs but the observer never fires, which would otherwise strand
+ * a block at `opacity: 0`.
+ *
+ * Returns a cleanup function so React Strict Mode's double-mount in development
+ * tears the observer and timer down instead of leaking both.
  */
+export default function useReveal(): () => void {
+  if (typeof window === 'undefined') return () => {}
 
-type RevealCallback = () => void
+  const show = (el: Element) => el.classList.add('is-fade-in')
 
-const OBSERVER_OPTIONS: IntersectionObserverInit = {
-  // threshold 0 means "as soon as any part is visible". A higher threshold can
-  // never be reached by an element taller than the viewport, which would leave
-  // it stuck at opacity 0 forever.
-  rootMargin: '0px 0px -8% 0px',
-  threshold: 0,
-}
+  const blocks = document.querySelectorAll('[data-fade]')
 
-let rootObserver: IntersectionObserver | null = null
-const rootObservers = new WeakMap<Element, IntersectionObserver>()
-const callbacks = new WeakMap<Element, RevealCallback>()
-const assigned = new WeakMap<Element, IntersectionObserver>()
+  const timer = window.setTimeout(() => {
+    blocks.forEach(show)
+  }, 1500)
 
-function handleEntries(entries: IntersectionObserverEntry[]) {
-  for (const entry of entries) {
-    if (!entry.isIntersecting) continue
-    callbacks.get(entry.target)?.()
-    assigned.get(entry.target)?.unobserve(entry.target)
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue
+        show(entry.target)
+        observer.unobserve(entry.target)
+      }
+    },
+    { threshold: 0.1, rootMargin: '0px 0px -40px 0px' },
+  )
+
+  blocks.forEach((el) => observer.observe(el))
+
+  // Skip the animation entirely for people who asked for less motion.
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    blocks.forEach(show)
   }
-}
-
-function getObserver(root?: Element | null): IntersectionObserver | null {
-  if (typeof IntersectionObserver === 'undefined') return null
-
-  if (!root) {
-    if (!rootObserver) rootObserver = new IntersectionObserver(handleEntries, OBSERVER_OPTIONS)
-    return rootObserver
-  }
-
-  let observer = rootObservers.get(root)
-  if (!observer) {
-    observer = new IntersectionObserver(handleEntries, { ...OBSERVER_OPTIONS, root })
-    rootObservers.set(root, observer)
-  }
-  return observer
-}
-
-/**
- * Observes a single element. When IntersectionObserver is unavailable the
- * callback runs immediately so content is never left invisible.
- */
-export function registerReveal(element: Element, callback: RevealCallback, root?: Element | null) {
-  const observer = getObserver(root)
-  if (!observer) {
-    callback()
-    return () => {}
-  }
-
-  callbacks.set(element, callback)
-  assigned.set(element, observer)
-  observer.observe(element)
 
   return () => {
-    callbacks.delete(element)
-    assigned.delete(element)
-    observer.unobserve(element)
+    window.clearTimeout(timer)
+    observer.disconnect()
   }
-}
-
-/**
- * Reveals the direct children of a container one by one. Staggering is handled
- * in CSS by `data-reveal-stagger` nth-child rules, so this only flips the class
- * on each child as it scrolls into view.
- *
- * Pass `rootRef` for a carousel: the track becomes the intersection root, so
- * every slide animates in together once the track itself is on screen instead of
- * leaving off-screen slides stuck at opacity 0 until the user swipes.
- */
-export function useRevealChildren<T extends HTMLElement>(
-  ref: RefObject<T | null>,
-  rootRef?: RefObject<Element | null>,
-) {
-  useEffect(() => {
-    const container = ref.current
-    if (!container) return
-
-    const root = rootRef?.current ?? null
-    const children = Array.from(container.children)
-    const cleanups = children.map((child) =>
-      registerReveal(
-        child,
-        () => child.classList.add('is-visible'),
-        root,
-      ),
-    )
-
-    return () => cleanups.forEach((cleanup) => cleanup())
-  }, [ref, rootRef])
 }

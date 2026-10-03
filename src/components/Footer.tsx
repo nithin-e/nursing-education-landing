@@ -1,44 +1,44 @@
-import { ArrowUpRight, Mail, MapPin, Phone } from 'lucide-react'
-
-import { NAV_LINKS, POLICY_LINKS, RESOURCE_LINKS, SITE, SOCIAL_LINKS } from '@/data/site'
+import { RESOURCE_ITEMS } from '@/data/nursingData'
+import { NAV_LINKS, POLICY_LINKS, SITE, SOCIAL_LINKS, TEL_HREF } from '@/data/site'
 import { BRAND_ICONS } from './ui/BrandIcons'
 import Logo from './ui/Logo'
-import EcgPulse from './ui/EcgPulse'
 
-/** Short placeholder policy copy so the footer links resolve to real content. */
+/** Short, plain statements — no demo or placeholder wording anywhere. */
 const LEGAL_COPY: Record<string, { title: string; body: string }> = {
   '#privacy': {
     title: 'Privacy Policy',
-    body: 'Placeholder policy. This static demo does not collect, store or transmit personal data. No analytics, cookies or third-party trackers are used, and the contact form validates entirely in your browser. Add your full privacy notice before publishing.',
+    body: 'We respect your privacy. Information you send through the form above is used only to reply to your enquiry.',
   },
   '#terms': {
     title: 'Terms & Conditions',
-    body: 'Placeholder terms. All content on this demo site is provided for general educational purposes only and does not constitute medical, legal or professional advice. Nursing requirements vary by country and regulator — always confirm official information with the relevant authority before acting on anything you read here.',
+    body: 'Content on this site is for general educational purposes only and does not constitute medical, legal or professional advice.',
   },
+}
+
+/** Reuses the resource copy rather than restating it in the footer. */
+const RESOURCE_LINKS = RESOURCE_ITEMS.map((item) => ({
+  label: item.title,
+  href: '#resources',
+}))
+
+function ColumnHeading({ children }: { children: string }) {
+  return (
+    <h2 className="text-[13px] font-semibold tracking-[0.18em] text-amber uppercase">
+      {children}
+    </h2>
+  )
 }
 
 export default function Footer() {
   const year = new Date().getFullYear()
 
   return (
-    <footer id="site-footer" className="relative overflow-hidden border-t border-line-strong bg-ink text-body pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0">
-      <div className="absolute inset-x-0 top-0 flex flex-col items-center justify-center pointer-events-none z-0">
-        <EcgPulse animate className="h-20 w-full opacity-15" />
-        <h2
-          aria-hidden
-          className="font-display font-extrabold uppercase tracking-tighter leading-none text-transparent [text-stroke:1px_rgba(255,255,255,0.08)] [-webkit-text-stroke:1px_rgba(255,255,255,0.08)] text-[clamp(80px,18vw,240px)] whitespace-nowrap -translate-y-2"
-        >
-          {SITE.name}
-        </h2>
-      </div>
-      <div className="container-page py-14 lg:py-20 relative">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_0.8fr_0.8fr_1fr] lg:gap-10">
-          {/* Brand */}
-          <div className="flex min-w-0 flex-col gap-5">
-            <Logo tone="dark" />
-            <p className="max-w-sm text-[0.95rem] leading-relaxed text-body">
-              {SITE.description}
-            </p>
+    <footer className="bg-navy-deep pb-[calc(2rem+env(safe-area-inset-bottom))]">
+      <div className="container-page pt-14 md:pt-16">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="flex flex-col items-start gap-5">
+            <Logo size="lg" />
+            <p className="font-display text-xl font-light text-white">{SITE.tagline}</p>
             <ul className="flex gap-3">
               {SOCIAL_LINKS.map((social) => {
                 const Icon = BRAND_ICONS[social.label as keyof typeof BRAND_ICONS]
@@ -47,7 +47,7 @@ export default function Footer() {
                     <a
                       href={social.href}
                       aria-label={social.label}
-                      className="grid size-11 place-items-center rounded-pill border border-white/15 text-white/70 transition-colors duration-200 hover:border-amber hover:text-amber"
+                      className="grid size-12 place-items-center rounded-full border border-white/20 text-white transition-colors duration-200 hover:border-amber hover:text-amber"
                     >
                       <Icon />
                     </a>
@@ -57,20 +57,14 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Quick links */}
-          <nav aria-labelledby="footer-nav">
-            <h2
-              id="footer-nav"
-              className="font-mono text-xs font-medium tracking-[0.15em] text-white uppercase"
-            >
-              Quick Navigation
-            </h2>
-            <ul className="mt-5 flex flex-col gap-1">
+          <nav aria-label="Footer">
+            <ColumnHeading>Quick Links</ColumnHeading>
+            <ul className="mt-5 flex flex-col">
               {NAV_LINKS.map((link) => (
-                <li key={link.label}>
+                <li key={link.href}>
                   <a
                     href={link.href}
-                    className="inline-flex min-h-11 items-center text-sm text-body transition-colors duration-200 hover:text-amber"
+                    className="flex min-h-11 items-center text-[15px] text-muted transition-colors duration-200 hover:text-amber"
                   >
                     {link.label}
                   </a>
@@ -79,20 +73,14 @@ export default function Footer() {
             </ul>
           </nav>
 
-          {/* Resources */}
-          <nav aria-labelledby="footer-resources">
-            <h2
-              id="footer-resources"
-              className="font-mono text-xs font-medium tracking-[0.15em] text-white uppercase"
-            >
-              Nursing Resources
-            </h2>
-            <ul className="mt-5 flex flex-col gap-1">
+          <nav aria-label="Nursing resources">
+            <ColumnHeading>Nursing Resources</ColumnHeading>
+            <ul className="mt-5 flex flex-col">
               {RESOURCE_LINKS.map((link) => (
                 <li key={link.label}>
                   <a
                     href={link.href}
-                    className="inline-flex min-h-11 items-center text-sm text-body transition-colors duration-200 hover:text-amber"
+                    className="flex min-h-11 items-center text-[15px] text-muted transition-colors duration-200 hover:text-amber"
                   >
                     {link.label}
                   </a>
@@ -101,53 +89,39 @@ export default function Footer() {
             </ul>
           </nav>
 
-          {/* Contact */}
           <div>
-            <h2 className="font-mono text-xs font-medium tracking-[0.15em] text-white uppercase">
-              Get in Touch
-            </h2>
-            <ul className="mt-5 flex flex-col gap-1">
-              <li className="flex items-start gap-3 text-sm text-body">
-                <Mail className="mt-3.5 size-4 shrink-0 text-amber" aria-hidden="true" />
+            <ColumnHeading>Contact Info</ColumnHeading>
+            <ul className="mt-5 flex flex-col gap-2">
+              <li>
                 <a
-                  href={`mailto:${SITE.email}`}
-                  className="inline-flex min-h-11 items-center break-words transition-colors duration-200 hover:text-amber"
-                >
-                  {SITE.email}
-                </a>
-              </li>
-              <li className="flex items-start gap-3 text-sm text-body">
-                <Phone className="mt-3.5 size-4 shrink-0 text-amber" aria-hidden="true" />
-                <a
-                  href={`tel:${SITE.phone.replace(/[^+\d]/g, '')}`}
-                  className="inline-flex min-h-11 items-center transition-colors duration-200 hover:text-amber"
+                  href={TEL_HREF}
+                  className="flex min-h-11 items-center text-[15px] break-words text-white transition-colors duration-200 hover:text-amber"
                 >
                   {SITE.phone}
                 </a>
               </li>
-              <li className="flex items-start gap-3 text-sm text-body">
-                <MapPin className="mt-3.5 size-4 shrink-0 text-amber" aria-hidden="true" />
-                <span className="inline-flex min-h-11 items-center">{SITE.location}</span>
+              <li>
+                <a
+                  href={`mailto:${SITE.email}`}
+                  className="flex min-h-11 items-center text-[15px] break-words text-white transition-colors duration-200 hover:text-amber"
+                >
+                  {SITE.email}
+                </a>
               </li>
             </ul>
-
-            <a href="#contact" className="link-arrow mt-4 min-h-11 items-center text-sm">
-              Send us a message
-              <ArrowUpRight className="size-4" aria-hidden="true" />
-            </a>
+            <p className="mt-4 text-[15px] leading-relaxed text-muted">{SITE.description}</p>
           </div>
         </div>
 
-        {/* Legal */}
-        <div className="mt-12 grid gap-6 border-t border-line pt-10 md:grid-cols-2">
+        <div className="mt-12 grid gap-8 border-t border-line pt-8 sm:grid-cols-2">
           {POLICY_LINKS.map((link) => {
             const copy = LEGAL_COPY[link.href]
             return (
-              <section key={link.href} id={link.href.replace('#', '')} className="scroll-mt-24">
-                <h2 className="font-mono text-xs font-medium tracking-[0.15em] text-amber uppercase">
+              <section key={link.href} id={link.href.replace('#', '')} className="scroll-mt-[96px] lg:scroll-mt-[116px]">
+                <h2 className="text-sm font-semibold tracking-[0.18em] text-amber uppercase">
                   {copy.title}
                 </h2>
-                <p className="mt-3 max-w-[60ch] text-xs leading-relaxed text-muted">
+                <p className="mt-3 max-w-[60ch] text-sm leading-relaxed text-muted">
                   {copy.body}
                 </p>
               </section>
@@ -155,17 +129,17 @@ export default function Footer() {
           })}
         </div>
 
-        <div className="mt-10 flex flex-col gap-4 border-t border-line pt-8 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xs text-muted">
-            &copy; {year} {SITE.name}. All rights reserved. Educational content only — not medical
-            advice.
+        <div className="mt-10 flex flex-col gap-4 border-t border-line pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-muted">
+            &copy; {year} {SITE.name}
           </p>
-          <ul className="flex flex-wrap items-center gap-x-6 gap-y-2">
+
+          <ul className="flex flex-wrap gap-x-6 gap-y-2">
             {POLICY_LINKS.map((link) => (
-              <li key={link.label}>
+              <li key={link.href}>
                 <a
                   href={link.href}
-                  className="inline-flex min-h-11 items-center text-xs text-muted transition-colors duration-200 hover:text-amber"
+                  className="text-sm text-muted transition-colors duration-200 hover:text-amber"
                 >
                   {link.label}
                 </a>
