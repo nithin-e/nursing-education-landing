@@ -1,34 +1,42 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import type { CSSProperties, KeyboardEvent } from 'react'
+import type { KeyboardEvent } from 'react'
 import { ArrowLeft, ArrowRight, MapPin, MessageCircle } from 'lucide-react'
 
 import { getImageFallbacks, resolvePhoto } from '@/data/images'
-import { PEOPLE } from '@/data/people'
+import { PEOPLE, SHOW_PHOTOS } from '@/data/people'
 import type { Person } from '@/data/people'
 import Section from './ui/Section'
 import SectionHeading from './ui/SectionHeading'
-import ConnectModal from './ui/ConnectModal'
+import DefaultAvatar from './ui/DefaultAvatar'
+import { useEnquiryModal } from './EnquiryModalProvider'
 import ErrorBoundary from './ui/ErrorBoundary'
 
-const GAP = 20
 const INTERVAL = 3500
 const RESUME_DELAY = 2000
 
-/**
- * One crop per card. Two cards share a photograph, so identical positions would
- * make the pair look like a duplicated image.
- */
-const OBJECT_POSITIONS = ['30% 25%', '60% 30%', '50% 45%', '40% 60%', '70% 35%', '25% 55%']
+/** Rendered 180px on desktop and 140px on mobile; the attributes reserve it. */
+const AVATAR_SIZE = 180
 
 type CardProps = {
   person: Person
-  index: number
   onMessage: (person: Person, trigger: HTMLButtonElement | null) => void
 }
 
-function PersonCard({ person, index, onMessage }: CardProps) {
+/**
+ * One card per person.
+ *
+ * The avatar is the neutral `DefaultAvatar` silhouette while `SHOW_PHOTOS` is
+ * false. The photograph path is kept intact behind that flag — original source
+ * first, then the shared fallback pool on `onError` — so switching the flag back
+ * on needs no edit here. The per-card `object-position` list went away with the
+ * photos: it only existed to keep a face inside the crop, and a placeholder has
+ * no face to place.
+ */
+function PersonCard({ person, onMessage }: CardProps) {
   const [step, setStep] = useState(0)
-  const [exhausted, setExhausted] = useState(false)
+  /* Set once the fallback chain runs out, so a photo that cannot be loaded
+     settles on the silhouette instead of a broken frame. */
+  const [failed, setFailed] = useState(false)
   const triggerRef = useRef<HTMLButtonElement | null>(null)
 
   const chain = useMemo(
@@ -36,16 +44,17 @@ function PersonCard({ person, index, onMessage }: CardProps) {
     [person.photo],
   )
 
-  if (exhausted || chain.length === 0) return null
-
   /* Chain mixes the card's own path with bare pooled fallbacks, so normalise it
-     before reading anything off it. */
-  const source = resolvePhoto(chain[Math.min(step, chain.length - 1)]).source
-  if (!source) return null
+     before reading anything off it. Empty chain or an exhausted chain both mean
+     "no photo", which is the same state the placeholder covers. */
+  const photo =
+    SHOW_PHOTOS && !failed && chain.length > 0
+      ? resolvePhoto(chain[Math.min(step, chain.length - 1)]).source
+      : null
 
   const advance = () => {
     if (step < chain.length - 1) setStep((current) => current + 1)
-    else setExhausted(true)
+    else setFailed(true)
   }
 
   return (
@@ -53,52 +62,57 @@ function PersonCard({ person, index, onMessage }: CardProps) {
     // inside a card, which is narrower than the button.
     <li
       data-fade=""
-      style={{ '--card-rest-border': 'rgb(255 255 255 / 0.08)' } as CSSProperties}
-      className="card-hover w-[82%] shrink-0 snap-start overflow-hidden rounded-card bg-slate-deep lg:w-auto lg:basis-[calc((100%_-_40px)/3)]"
+      className="w-[84%] shrink-0 snap-start rounded-[32px] bg-slate-deep px-8 pt-9 pb-8 text-center lg:w-auto lg:basis-[calc((100%_-_64px)/3)]"
     >
-      <div className="relative">
-        <img
-          src={source.src}
-          alt="Nursing professional"
-          width={source.width}
-          height={source.height}
-          loading="lazy"
-          decoding="async"
-          style={{ objectPosition: OBJECT_POSITIONS[index % OBJECT_POSITIONS.length] }}
-          onError={advance}
-          className="aspect-[4/4.4] w-full object-cover"
-        />
-        {person.tag ? (
-          <span className="absolute -bottom-3 left-5 z-10 rounded-pill bg-amber px-3 py-1.5 text-[12px] font-semibold tracking-[0.06em] text-black uppercase">
-            {person.tag}
-          </span>
-        ) : null}
+      {/* The circle and its responsive sizes stay with the card, so swapping a
+          photo for the placeholder cannot shift the layout. */}
+      <div className="mx-auto size-[140px] overflow-hidden rounded-full bg-slate-deep lg:size-[180px]">
+        {photo ? (
+          <img
+            src={photo.src}
+            alt="Nursing professional"
+            width={AVATAR_SIZE}
+            height={AVATAR_SIZE}
+            loading="lazy"
+            decoding="async"
+            onError={advance}
+            className="size-full object-cover object-center"
+          />
+        ) : (
+          <DefaultAvatar size={AVATAR_SIZE} />
+        )}
       </div>
 
-      <div className="p-6">
-        {person.name ? (
-          <h3 className="font-display text-[22px] font-bold text-white">{person.name}</h3>
-        ) : null}
-        {person.role ? (
-          <p className="mt-2 line-clamp-2 text-sm text-muted">{person.role}</p>
-        ) : null}
-        {person.location ? (
-          <p className="mt-2 flex items-center gap-1.5 text-[13px] text-muted">
-            <MapPin className="size-3.5 shrink-0" aria-hidden="true" />
-            {person.location}
-          </p>
-        ) : null}
+      <h3 className="mt-6 line-clamp-2 font-display text-[24px] font-bold text-white lg:line-clamp-1 lg:text-[28px]">
+        {person.name}
+      </h3>
 
-        <button
-          ref={triggerRef}
-          type="button"
-          onClick={() => onMessage(person, triggerRef.current)}
-          className="mt-6 inline-flex min-h-[52px] w-full items-center justify-center gap-2 rounded-pill bg-amber px-4 text-sm font-semibold whitespace-nowrap text-black transition-colors duration-200 hover:bg-white"
-        >
-          <MessageCircle className="size-4 shrink-0" aria-hidden="true" />
-          Message
-        </button>
-      </div>
+      {person.role ? (
+        <p className="mt-2.5 line-clamp-2 text-[18px] leading-[1.6] text-[#D1D5DB]">
+          {person.role}
+        </p>
+      ) : null}
+
+      {person.tag ? (
+        <p className="mt-1.5 text-[16px] text-muted uppercase">{person.tag}</p>
+      ) : null}
+
+      {person.location ? (
+        <p className="mt-1.5 flex items-center justify-center gap-1.5 text-[16px] text-muted">
+          <MapPin className="size-4 shrink-0" aria-hidden="true" />
+          {person.location}
+        </p>
+      ) : null}
+
+      <button
+        ref={triggerRef}
+        type="button"
+        onClick={() => onMessage(person, triggerRef.current)}
+        className="mt-7 inline-flex min-h-[56px] w-full items-center justify-start gap-2 rounded-pill bg-amber px-6 text-[18px] font-semibold text-black transition-colors duration-200 hover:bg-white"
+      >
+        <MessageCircle className="size-5 shrink-0" aria-hidden="true" />
+        Message
+      </button>
     </li>
   )
 }
@@ -106,12 +120,11 @@ function PersonCard({ person, index, onMessage }: CardProps) {
 export default function People() {
   const sectionRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLUListElement>(null)
-  /** The Message button that opened the dialog, so focus can go back to it. */
-  const lastTriggerRef = useRef<HTMLButtonElement | null>(null)
+
+  const { openPersonMessage, isOpen: enquiryOpen } = useEnquiryModal()
 
   const [activeIndex, setActiveIndex] = useState(0)
   const [pageCount, setPageCount] = useState(1)
-  const [modalName, setModalName] = useState<string | null>(null)
 
   /* Auto-scroll stops while any one of these is true. */
   const [inView, setInView] = useState(false)
@@ -120,7 +133,7 @@ export default function People() {
   const [interacting, setInteracting] = useState(false)
   const [tabVisible, setTabVisible] = useState(true)
 
-  const paused = reduced || !inView || hovering || interacting || !tabVisible || modalName !== null
+  const paused = reduced || !inView || hovering || interacting || !tabVisible || enquiryOpen
 
   /* Advance only while the band is actually on screen. */
   useEffect(() => {
@@ -160,7 +173,12 @@ export default function People() {
     const card = track?.firstElementChild
     if (!track || !(card instanceof HTMLElement)) return 0
 
-    return card.getBoundingClientRect().width + GAP
+    /* Read the live gap rather than a constant: it is 20px on the mobile swipe
+       row and 32px across the three-up grid, and the scroll maths has to match
+       whichever one is showing. */
+    const gap = Number.parseFloat(window.getComputedStyle(track).columnGap)
+
+    return card.getBoundingClientRect().width + (Number.isNaN(gap) ? 0 : gap)
   }, [])
 
   const maxScroll = useCallback(() => {
@@ -263,10 +281,12 @@ export default function People() {
     }
   }, [stride, maxScroll])
 
-  const openMessage = useCallback((person: Person, trigger: HTMLButtonElement | null) => {
-    lastTriggerRef.current = trigger
-    setModalName(person.name)
-  }, [])
+  const openMessage = useCallback(
+    (person: Person, trigger: HTMLButtonElement | null) => {
+      openPersonMessage(person.name, trigger)
+    },
+    [openPersonMessage],
+  )
 
   const nudge = (direction: -1 | 1) => {
     setInteracting(true)
@@ -299,40 +319,45 @@ export default function People() {
             description="Critical care, emergency, theatre, paediatric, community and mental health nursing."
           />
 
-          <div className="mt-8 hidden justify-center gap-4 md:flex">
+          {/* Arrows straddle the track rather than sitting under the heading, so
+              they line up with the cards' vertical centre. -12px keeps them
+              inside the container's own padding, so they can never overlap a
+              card's text. */}
+          <div className="relative mt-8">
             <button
               type="button"
               onClick={() => nudge(-1)}
               aria-label="Scroll to the previous person"
-              className="grid size-12 place-items-center rounded-full border border-amber text-amber transition-colors duration-200 hover:bg-amber hover:text-black"
+              className="absolute -left-3 top-1/2 z-10 hidden size-12 -translate-y-1/2 place-items-center rounded-full border-2 border-amber bg-transparent text-amber transition-colors duration-200 hover:bg-amber hover:text-black lg:grid"
             >
               <ArrowLeft className="size-5" aria-hidden="true" />
             </button>
+
+            <ul
+              ref={trackRef}
+              onKeyDown={onKeyDown}
+              onMouseEnter={() => setHovering(true)}
+              onMouseLeave={() => setHovering(false)}
+              onTouchStart={() => setInteracting(true)}
+              onPointerDown={() => setInteracting(true)}
+              tabIndex={0}
+              aria-label="Nursing professionals"
+              className="-mx-5 flex snap-x snap-mandatory gap-5 overflow-x-auto px-5 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:px-0 md:pb-0 lg:gap-8"
+            >
+              {PEOPLE.map((person) => (
+                <PersonCard key={person.id} person={person} onMessage={openMessage} />
+              ))}
+            </ul>
+
             <button
               type="button"
               onClick={() => nudge(1)}
               aria-label="Scroll to the next person"
-              className="grid size-12 place-items-center rounded-full border border-amber text-amber transition-colors duration-200 hover:bg-amber hover:text-black"
+              className="absolute -right-3 top-1/2 z-10 hidden size-12 -translate-y-1/2 place-items-center rounded-full border-2 border-amber bg-transparent text-amber transition-colors duration-200 hover:bg-amber hover:text-black lg:grid"
             >
               <ArrowRight className="size-5" aria-hidden="true" />
             </button>
           </div>
-
-          <ul
-            ref={trackRef}
-            onKeyDown={onKeyDown}
-            onMouseEnter={() => setHovering(true)}
-            onMouseLeave={() => setHovering(false)}
-            onTouchStart={() => setInteracting(true)}
-            onPointerDown={() => setInteracting(true)}
-            tabIndex={0}
-            aria-label="Nursing professionals"
-            className="-mx-5 mt-8 flex snap-x snap-mandatory gap-5 overflow-x-auto px-5 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:px-0 md:pb-0"
-          >
-            {PEOPLE.map((person, index) => (
-              <PersonCard key={person.id} person={person} index={index} onMessage={openMessage} />
-            ))}
-          </ul>
 
           <div className="mt-4 flex justify-center">
             {Array.from({ length: pageCount }, (_, index) => (
@@ -358,12 +383,6 @@ export default function People() {
           </div>
         </Section>
       </div>
-
-      <ConnectModal
-        personName={modalName}
-        trigger={lastTriggerRef.current}
-        onClose={() => setModalName(null)}
-      />
     </ErrorBoundary>
   )
 }

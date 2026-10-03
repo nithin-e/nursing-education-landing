@@ -1,4 +1,5 @@
-import { SITE, TEL_HREF } from '@/data/site'
+import { MAILTO_HREF, TEL_HREF } from '@/data/contact'
+import { SITE } from '@/data/site'
 import ContactForm from './ui/ContactForm'
 import Section from './ui/Section'
 import SectionHeading from './ui/SectionHeading'
@@ -39,7 +40,7 @@ export default function Contact() {
                 <dt className="text-sm text-muted">Email</dt>
                 <dd className="mt-1">
                   <a
-                    href={`mailto:${SITE.email}`}
+                    href={MAILTO_HREF}
                     className="font-semibold break-words text-white transition-colors duration-200 hover:text-amber"
                   >
                     {SITE.email}

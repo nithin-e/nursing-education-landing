@@ -2,6 +2,7 @@ import { useState } from 'react'
 
 import { ABOUT_ROWS, ABOUT_TEXT, STATS } from '@/data/nursingData'
 import { cn } from '@/lib/cn'
+import { useEnquiryModal } from './EnquiryModalProvider'
 import Photo from './ui/Photo'
 import Section from './ui/Section'
 import SectionHeading from './ui/SectionHeading'
@@ -15,6 +16,7 @@ import Button from './ui/Button'
  */
 export default function About() {
   const [photoMissing, setPhotoMissing] = useState(false)
+  const { openAdmission } = useEnquiryModal()
 
   return (
     <Section id="about">
@@ -24,16 +26,16 @@ export default function About() {
           !photoMissing && 'lg:flex-row lg:items-center lg:gap-16',
         )}
       >
-        {photoMissing ? null : (
-          <div className="lg:w-1/2 lg:shrink-0" data-fade="">
-            <Photo
-              slot="aboutMain"
-              alt="Nurse providing hands-on care to a patient"
-              className="w-full"
-              onFail={() => setPhotoMissing(true)}
-            />
-          </div>
-        )}
+{photoMissing ? null : (
+            <div className="lg:w-1/2 lg:shrink-0" data-fade="">
+              <Photo
+                slot="aboutMain"
+                alt="Dr Expert Edulinks events and students"
+                className="w-full max-w-[560px] !rounded-[24px] !border-[rgb(255_255_255/0.08)] min-[769px]:!rounded-[28px]"
+                onFail={() => setPhotoMissing(true)}
+              />
+            </div>
+          )}
 
         <div
           className={cn(!photoMissing && 'lg:w-1/2', photoMissing && 'mx-auto w-full max-w-2xl')}
@@ -61,7 +63,10 @@ export default function About() {
           </dl>
 
           <div className="mt-8">
-            <Button href="#contact" variant="primary">
+            <Button
+              variant="primary"
+              onClick={(event) => openAdmission(event.currentTarget)}
+            >
               Contact Us
             </Button>
           </div>

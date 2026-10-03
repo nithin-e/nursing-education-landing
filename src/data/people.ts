@@ -1,3 +1,4 @@
+import { PHONE_DIGITS } from '@/data/contact'
 import { getImage } from './images'
 import type { ImageSlot } from './images'
 
@@ -30,6 +31,14 @@ export type Person = {
   messageText: string
 }
 
+/**
+ * Whether the people cards render each person's `photo` or the neutral
+ * `DefaultAvatar` silhouette.
+ *
+ * Set to true once real profile photos are added.
+ */
+export const SHOW_PHOTOS = false
+
 /** `Careers` → `Nursing Specializations`, unchanged. */
 const ROLE_SPECIALISATIONS =
   'Critical care, emergency, theatre, paediatric, community and mental health nursing.'
@@ -42,19 +51,29 @@ const ROLE_PROGRESSION =
 const ROLE_INTERNATIONAL =
   'Licensing portability, language requirements and cultural competency for practice abroad.'
 
-const WHATSAPP = '919656349000'
+/** Reuses the site-wide number so the people cards can never hold a stale copy. */
+const WHATSAPP = PHONE_DIGITS
 
 const MESSAGE =
   'Hello, I would like to know more about nursing specializations and career pathways.'
 
-/** Slot order chosen so repeated files are never adjacent. */
+/**
+ * Slot order chosen so repeated files are never adjacent.
+ *
+ * These six slots point at six different files, so every card shows a different
+ * face. They previously borrowed the research and exams slots, which meant a
+ * change to either of those sections silently swapped a person's photo: the
+ * resources banner became `2 (1).webp` and the exams inset became `8.webp`, and
+ * three cards were left showing the same file at once. Dedicated slots make that
+ * class of change impossible.
+ */
 const PHOTO_SLOTS: ImageSlot[] = [
-  'researchCard1',
-  'researchCard2',
-  'researchCard3',
-  'aboutMain',
-  'resourcesBanner',
-  'examsMain',
+  'peopleCard1',
+  'peopleCard2',
+  'peopleCard3',
+  'peopleCard4',
+  'peopleCard5',
+  'peopleCard6',
 ]
 
 function photoFor(index: number): string {

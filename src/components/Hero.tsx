@@ -3,7 +3,7 @@ import type { CSSProperties } from 'react'
 import { ArrowRight, Sparkle } from 'lucide-react'
 
 import { HERO_HEADLINE, HERO_HEADLINE_2, HERO_LABEL, HERO_TEXT } from '@/data/nursingData'
-import { getImage, type ImageSlot } from '@/data/images'
+import { getImage, resolvePhoto, type ImageSlot } from '@/data/images'
 import { SITE } from '@/data/site'
 import Button from './ui/Button'
 
@@ -15,6 +15,10 @@ import Button from './ui/Button'
  *
  * Each photo resolves through the central image map and carries its own
  * `object-position`, so the same file never looks like the same shot twice.
+ *
+ * The three frames point at the dedicated event photographs in `DEDICATED_SOURCES`
+ * (`/images/1.webp`, `2.webp`, `3.webp`); `SLOTS` is the only place those
+ * filenames appear.
  */
 const BAND: {
   slot: ImageSlot
@@ -23,20 +27,30 @@ const BAND: {
   /** Only applied from `md` up. */
   lift: string
 }[] = [
-  { slot: 'heroBandLeft', track: '1fr', lift: 'md:translate-y-4' },
-  { slot: 'heroBandCenter', track: '1.4fr', lift: 'md:-translate-y-6' },
-  { slot: 'heroBandRight', track: '1fr', lift: 'md:translate-y-4' },
+  { slot: 'heroBandLeft', track: '1fr', lift: 'md:translate-y-3' },
+  { slot: 'heroBandCenter', track: '1fr', lift: 'md:-translate-y-5' },
+  { slot: 'heroBandRight', track: '1fr', lift: 'md:translate-y-3' },
 ]
 
-/** What the band collapses to when one or more photos fail to load. */
-const FALLBACK_TRACKS = ['1fr', '1fr 1fr', '1fr 1.4fr 1fr']
+/**
+ * What the band collapses to when one or more photos fail to load — three equal
+ * columns, so a survivor expands rather than leaving a hole.
+ */
+const FALLBACK_TRACKS = ['1fr', '1fr 1fr', '1fr 1fr 1fr']
 
 export default function Hero() {
   const [hidden, setHidden] = useState<number[]>([])
 
-  const photos = BAND.map((item, index) => ({ ...item, index, image: getImage(item.slot) })).filter(
-    (item) => item.image && !hidden.includes(item.index),
-  )
+  /* Normalised once here, so the JSX below never asserts. `getImage` returns a
+     slot result, which `resolvePhoto` unwraps into a plain `source` + `crop`. */
+  const photos = BAND.flatMap((item, index) => {
+    if (hidden.includes(index)) return []
+
+    const { source, crop } = resolvePhoto(getImage(item.slot))
+    if (!source || !crop) return []
+
+    return [{ ...item, index, source, crop }]
+  })
 
   const markHidden = (index: number) =>
     setHidden((previous) => (previous.includes(index) ? previous : [...previous, index]))
@@ -93,21 +107,21 @@ export default function Hero() {
 
         {photos.length > 0 ? (
           <div
-            className="-mx-5 mt-16 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:grid md:overflow-visible md:px-0 md:[grid-template-columns:var(--band-tracks)]"
+            className="-mx-5 mt-12 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:grid md:overflow-visible md:px-0 md:gap-5 md:[grid-template-columns:var(--band-tracks)]"
             style={{ '--band-tracks': FALLBACK_TRACKS[photos.length - 1] } as CSSProperties}
           >
             {photos.map((photo, position) => (
               <img
                 key={photo.slot}
-                src={photo.image!.source.src}
-                alt={photo.image!.source.alt}
-                width={photo.image!.source.width}
-                height={photo.image!.source.height}
+                src={photo.source.src}
+                alt={photo.source.alt}
+                width={photo.source.width}
+                height={photo.source.height}
                 loading={position === 0 ? 'eager' : 'lazy'}
                 decoding="async"
                 onError={() => markHidden(photo.index)}
-                style={{ objectPosition: photo.image!.crop.position }}
-                className={`h-[280px] w-[78%] shrink-0 snap-start rounded-[24px] object-cover md:h-[420px] md:w-auto md:rounded-[28px] ${photo.lift}`}
+                style={{ objectPosition: photo.crop.position }}
+                className={`aspect-[4/3] h-auto w-[86%] shrink-0 snap-start rounded-[24px] object-cover md:w-full md:rounded-[28px] ${photo.lift}`}
               />
             ))}
           </div>
