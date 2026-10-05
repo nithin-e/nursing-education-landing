@@ -16,6 +16,11 @@ export type EnquiryPayload = {
    * lead source reaches the backend.
    */
   source?: string
+  /**
+   * Which card or topic prompted the enquiry, e.g. `Nursing Education`. Empty
+   * for entry points that are not tied to a specific card.
+   */
+  interest?: string
   name: string
   email: string
   /** Dialling code including the plus, e.g. `+91`. */

@@ -3,6 +3,7 @@ import { Play } from 'lucide-react'
 import { RESEARCH_ITEMS } from '@/data/nursingData'
 import type { ImageSlot } from '@/data/images'
 import Photo from './ui/Photo'
+import { useEnquiryModal } from './EnquiryModalProvider'
 import Section from './ui/Section'
 import SectionHeading from './ui/SectionHeading'
 
@@ -10,6 +11,7 @@ import SectionHeading from './ui/SectionHeading'
 const CARD_SLOTS: ImageSlot[] = ['researchCard1', 'researchCard2', 'researchCard3']
 
 export default function Research() {
+  const { openAdmission } = useEnquiryModal()
   return (
     <Section id="research">
       <SectionHeading
@@ -36,12 +38,14 @@ export default function Research() {
 
               <p className="mt-3 text-[15px] leading-relaxed text-muted">{item.summary}</p>
 
-              <a
-                href="#contact"
-                className="mt-5 inline-flex min-h-11 items-center gap-1 text-[14px] font-semibold text-amber transition-colors duration-200 hover:text-white"
+              <button
+                type="button"
+                onClick={(event) => openAdmission(event.currentTarget, item.title)}
+                aria-label={`Explore ${item.title}`}
+                className="mt-5 inline-flex min-h-11 items-center gap-1 text-[14px] font-semibold text-amber transition-colors duration-200 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber"
               >
                 Explore More
-              </a>
+              </button>
             </div>
           </li>
         ))}

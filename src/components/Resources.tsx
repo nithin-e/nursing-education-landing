@@ -1,12 +1,15 @@
 import { ArrowRight } from 'lucide-react'
 
 import { RESOURCE_ITEMS } from '@/data/nursingData'
+import { useEnquiryModal } from './EnquiryModalProvider'
 import Photo from './ui/Photo'
 import Section from './ui/Section'
 import SectionHeading from './ui/SectionHeading'
 
 /** Tile grid plus one wide photo banner. */
 export default function Resources() {
+  const { openAdmission } = useEnquiryModal()
+
   return (
     <Section id="resources">
       <SectionHeading
@@ -47,16 +50,19 @@ export default function Resources() {
               <p className="mt-2 text-[15px] leading-[1.55] text-muted min-[769px]:text-[14px] min-[769px]:leading-relaxed">
                 {item.summary}
               </p>
-              {/* Stretched pseudo-element makes the whole phone-row card tappable
-                  from the one real link, so there is still only one focusable
-                  stop and no click handler needed. */}
-              <a
-                href="#contact"
-                className="mt-2.5 inline-flex min-h-11 items-center gap-1 text-[16px] font-semibold text-amber transition-colors duration-200 hover:text-white min-[769px]:mt-3 min-[769px]:text-[14px] max-[480px]:after:absolute max-[480px]:after:inset-0 max-[480px]:after:content-['']"
+              {/* A real button, not an anchor: the card has no page to navigate to, it opens
+                  the shared sign-up dialog. The stretched pseudo-element keeps the
+                  whole phone-row card tappable from this one control, so there is
+                  still a single focus stop and no click handler on the <li>. */}
+              <button
+                type="button"
+                onClick={(event) => openAdmission(event.currentTarget, item.title)}
+                aria-label={`Explore ${item.title}`}
+                className="mt-2.5 inline-flex min-h-11 items-center gap-1 text-[16px] font-semibold text-amber transition-colors duration-200 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber min-[769px]:mt-3 min-[769px]:text-[14px] max-[480px]:after:absolute max-[480px]:after:inset-0 max-[480px]:after:content-['']"
               >
                 Explore More
                 <ArrowRight className="size-4" aria-hidden="true" />
-              </a>
+              </button>
             </div>
           </li>
         ))}

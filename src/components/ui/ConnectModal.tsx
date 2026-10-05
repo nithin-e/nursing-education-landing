@@ -22,6 +22,9 @@ const EDUCATION_OPTIONS = [
 /** Lead source recorded when the form is opened by a "Get Admission" button. */
 const ADMISSION_SOURCE = 'get-admission'
 
+/** Lead source recorded when a content card's CTA opens the form. */
+export const CARD_SOURCE = 'resources'
+
 type Fields = {
   name: string
   email: string
@@ -85,6 +88,17 @@ export type ConnectModalProps = {
   /** Card the visitor clicked. `null` in `admission` mode. */
   personName: string | null
   /**
+   * Title of the card whose CTA opened the dialog, e.g. `Nursing Education`.
+   * Recorded so the backend knows what the visitor was reading, without
+   * changing the heading.
+   */
+  interest?: string | null
+  /**
+   * Lead source for `admission` entries. Defaults to the header/CTA value;
+   * content cards pass `CARD_SOURCE`.
+   */
+  source?: string
+  /**
    * The button that opened this dialog. Focus returns here on close.
    * Falls back to whatever had focus, so the dialog still restores sensibly if
    * a caller forgets it.
@@ -103,10 +117,13 @@ export default function ConnectModal({
   mode,
   open,
   personName,
+  interest = null,
+  source,
   trigger,
   onClose,
 }: ConnectModalProps) {
   const isAdmission = mode === 'admission'
+  const leadSource = source ?? ADMISSION_SOURCE
 
   const [fields, setFields] = useState<Fields>(EMPTY)
   const [errors, setErrors] = useState<Errors>({})
@@ -216,10 +233,11 @@ export default function ConnectModal({
     setSubmitting(true)
 
     const payload: EnquiryPayload = {
-      /* Admission leads have no addressee; they are tagged by source instead so
-         the backend can tell the two entry points apart. */
+      /* Admission leads have no addressee; they are tagged by source and, when a
+         card prompted them, by interest, so the backend can tell the entry
+         points apart. */
       contactPerson: isAdmission ? '' : (personName ?? ''),
-      ...(isAdmission ? { source: ADMISSION_SOURCE } : {}),
+      ...(isAdmission ? { source: leadSource, ...(interest ? { interest } : {}) } : {}),
       name: fields.name.trim(),
       email: fields.email.trim(),
       countryCode: fields.countryCode,
@@ -252,12 +270,15 @@ export default function ConnectModal({
       {/* Decorative dimmer. The click-to-close test lives on the container. */}
       <div className="connect-backdrop pointer-events-none absolute inset-0 bg-black/70 backdrop-blur-[4px]" aria-hidden="true" />
 
-      <div
+<div
         ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby={headingId}
-        className="connect-panel relative flex max-h-[92dvh] w-[92vw] max-w-[750px] flex-col overflow-y-auto rounded-t-[24px] bg-[#0F172A] p-6 min-[769px]:rounded-[24px] min-[769px]:p-9"
+        /* Desktop is a centred dialog capped at 560px; a phone gets a full-width
+           bottom sheet that keeps clear of the home indicator. Scrollbar
+           geometry and overscroll containment live in `.connect-panel`. */
+        className="connect-panel relative flex max-h-[92dvh] w-full flex-col overflow-y-auto rounded-t-[22px] bg-[#0F172A] px-5 pt-[22px] pb-[calc(22px+env(safe-area-inset-bottom))] min-[769px]:w-[92vw] min-[769px]:max-w-[560px] min-[769px]:rounded-[24px] min-[769px]:px-8 min-[769px]:py-7"
       >
         {/* Bottom-sheet affordance on phones only; a centred dialog has no edge
             to grab, so it would be meaningless on desktop. */}
@@ -270,7 +291,7 @@ export default function ConnectModal({
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="absolute top-4 right-4 grid size-11 shrink-0 place-items-center rounded-full text-white transition-colors duration-200 hover:text-amber min-[769px]:top-6 min-[769px]:right-6"
+          className="absolute top-3 right-3 grid size-10 shrink-0 place-items-center rounded-full text-white transition-colors duration-200 hover:text-amber min-[769px]:top-5 min-[769px]:right-5"
         >
           <X className="size-5" aria-hidden="true" />
         </button>
@@ -297,19 +318,24 @@ export default function ConnectModal({
           <>
             <h2
               id={headingId}
-              className="font-display pr-14 text-[26px] font-bold text-white min-[769px]:text-[34px]"
+              className="font-display pr-12 text-[24px] font-bold text-white min-[769px]:text-[28px]"
             >
               {isAdmission ? 'Sign up to continue' : `Connect with ${personName}`}
             </h2>
             {!isAdmission ? (
-              <p className="mt-2 text-[15px] text-muted">
+              <p className="mt-1 text-[14px] text-muted">
                 Please fill the form to connect with {personName}
               </p>
             ) : null}
 
-            <form onSubmit={handleSubmit} noValidate className="mt-7 flex flex-col gap-4 min-[769px]:gap-6">
+            {/* `mt-4` is the heading's 16px bottom margin in admission mode; in
+                person mode the subtext sits in between at 4px. */}
+            <form onSubmit={handleSubmit} noValidate className="mt-4 flex flex-col gap-3 min-[769px]:gap-3.5">
               {isAdmission ? (
-                <input type="hidden" name="source" value={ADMISSION_SOURCE} />
+                <>
+                  <input type="hidden" name="source" value={leadSource} />
+                  {interest ? <input type="hidden" name="interest" value={interest} /> : null}
+                </>
               ) : (
                 <input type="hidden" name="contactPerson" value={personName ?? ''} />
               )}
@@ -330,7 +356,7 @@ export default function ConnectModal({
                   className="field field-light"
                 />
                 {errorFor('name') ? (
-                  <p id="enquiry-name-error" className="mt-2 text-[14px] text-red-400">
+                  <p id="enquiry-name-error" className="mt-2 text-[13px] text-red-400">
                     {errorFor('name')}
                   </p>
                 ) : null}
@@ -351,7 +377,7 @@ export default function ConnectModal({
                   className="field field-light"
                 />
                 {errorFor('email') ? (
-                  <p id="enquiry-email-error" className="mt-2 text-[14px] text-red-400">
+                  <p id="enquiry-email-error" className="mt-2 text-[13px] text-red-400">
                     {errorFor('email')}
                   </p>
                 ) : null}
@@ -359,14 +385,14 @@ export default function ConnectModal({
 
               <div>
                 <Label htmlFor="enquiry-mobile">Mobile</Label>
-                <div className="flex gap-3">
-                  <div className="relative w-[30%] shrink-0">
+                <div className="flex gap-2.5">
+                  <div className="relative w-[28%] shrink-0">
                     <select
                       id="enquiry-country"
                       name="countryCode"
                       value={fields.countryCode}
                       onChange={handleChange('countryCode')}
-                      className="field field-light cursor-pointer pr-9 pl-4"
+                      className="field field-light cursor-pointer pr-8 pl-3"
                     >
                       {COUNTRY_CODES.map((code) => (
                         <option key={code} value={code}>
@@ -391,11 +417,11 @@ export default function ConnectModal({
                     onChange={handleChange('mobile')}
                     aria-invalid={errorFor('mobile') ? true : undefined}
                     aria-describedby={errorFor('mobile') ? 'enquiry-mobile-error' : undefined}
-                    className="field field-light"
+                    className="field field-light min-w-0 flex-1"
                   />
                 </div>
                 {errorFor('mobile') ? (
-                  <p id="enquiry-mobile-error" className="mt-2 text-[14px] text-red-400">
+                  <p id="enquiry-mobile-error" className="mt-2 text-[13px] text-red-400">
                     {errorFor('mobile')}
                   </p>
                 ) : null}
@@ -409,7 +435,7 @@ export default function ConnectModal({
                     name="education"
                     value={fields.education}
                     onChange={handleChange('education')}
-                    className="field field-light cursor-pointer pr-9 pl-4"
+                    className="field field-light cursor-pointer pr-8 pl-3"
                   >
                     {EDUCATION_OPTIONS.map((option) => (
                       <option key={option} value={option === 'Choose...' ? '' : option}>
@@ -439,7 +465,7 @@ export default function ConnectModal({
                   className="field field-light"
                 />
                 {errorFor('place') ? (
-                  <p id="enquiry-place-error" className="mt-2 text-[14px] text-red-400">
+                  <p id="enquiry-place-error" className="mt-2 text-[13px] text-red-400">
                     {errorFor('place')}
                   </p>
                 ) : null}
@@ -448,7 +474,7 @@ export default function ConnectModal({
               <button
                 type="submit"
                 disabled={submitting}
-                className="inline-flex min-h-14 w-full items-center justify-center rounded-pill bg-amber px-8 font-semibold text-black transition-colors duration-200 hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+                className="mt-2 inline-flex min-h-[48px] w-full items-center justify-center rounded-pill bg-amber px-8 text-[17px] font-semibold text-black transition-colors duration-200 hover:bg-white disabled:cursor-not-allowed disabled:opacity-60 min-[769px]:min-h-[50px]"
               >
                 {submitting ? 'Submitting...' : isAdmission ? 'Sign up' : 'Submit'}
               </button>

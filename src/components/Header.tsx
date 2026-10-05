@@ -1,6 +1,6 @@
 import { Phone } from 'lucide-react'
 
-import { TEL_HREF } from '@/data/contact'
+import { PHONE_DISPLAY, PHONE_TEL } from '@/data/contact'
 import { SITE } from '@/data/site'
 import { cn } from '@/lib/cn'
 import { useEnquiryModal } from './EnquiryModalProvider'
@@ -14,12 +14,15 @@ import Logo from './ui/Logo'
  * "Get Admission" button at 360px, so below `lg` the circle stands alone as a
  * 44px `tel:` target and the digits appear from `lg` up. The `aria-label` keeps
  * the icon-only state announced.
+ *
+ * The digits come from `PHONE_DISPLAY` and the dial target from `PHONE_TEL`, so
+ * the printed number and the dialled one cannot drift apart.
  */
 function PhoneLink({ className = '' }: { className?: string }) {
   return (
     <a
-      href={TEL_HREF}
-      aria-label={`Call ${SITE.phone}`}
+      href={PHONE_TEL}
+      aria-label={`Call ${PHONE_DISPLAY}`}
       className={cn(
         'flex min-h-11 shrink-0 items-center gap-3 text-white transition-colors duration-200 hover:text-amber',
         className,
@@ -28,7 +31,7 @@ function PhoneLink({ className = '' }: { className?: string }) {
       <span className="grid size-11 shrink-0 place-items-center rounded-full bg-amber text-black lg:size-10">
         <Phone className="size-4" aria-hidden="true" />
       </span>
-      <span className="hidden font-semibold whitespace-nowrap lg:inline">{SITE.phone}</span>
+      <span className="hidden font-semibold whitespace-nowrap lg:inline">{PHONE_DISPLAY}</span>
     </a>
   )
 }

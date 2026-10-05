@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ArrowRight } from 'lucide-react'
 
 import { EXAM_DISCLAIMER, EXAM_GLASS_TEXT, EXAM_ITEMS } from '@/data/nursingData'
+import { useEnquiryModal } from './EnquiryModalProvider'
 import Photo from './ui/Photo'
 import Section from './ui/Section'
 import SectionHeading from './ui/SectionHeading'
@@ -16,6 +17,7 @@ import Button from './ui/Button'
  */
 export default function Exams() {
   const [collageFailed, setCollageFailed] = useState(false)
+  const { openAdmission } = useEnquiryModal()
 
   return (
     <Section id="exams" tone="navy">
@@ -34,7 +36,11 @@ export default function Exams() {
           </div>
 
           <div className="mt-8">
-            <Button href="#contact" variant="primary">
+            <Button
+              variant="primary"
+              onClick={(event) => openAdmission(event.currentTarget)}
+              className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            >
               Learn More
               <ArrowRight className="size-4" aria-hidden="true" />
             </Button>
