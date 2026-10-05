@@ -2,6 +2,7 @@ import { useCallback, useRef } from 'react'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 
 import { CAREER_ITEMS } from '@/data/nursingData'
+import { useEnquiryModal } from './EnquiryModalProvider'
 import Photo from './ui/Photo'
 import Section from './ui/Section'
 import SectionHeading from './ui/SectionHeading'
@@ -16,6 +17,7 @@ import SectionHeading from './ui/SectionHeading'
  */
 export default function Careers() {
   const trackRef = useRef<HTMLUListElement>(null)
+  const { openAdmission } = useEnquiryModal()
 
   const scrollByPage = useCallback((direction: -1 | 1) => {
     const track = trackRef.current
@@ -67,13 +69,15 @@ export default function Careers() {
           >
             <h3 className="font-display text-xl font-bold text-white">{item.title}</h3>
             <p className="mt-3 text-[15px] leading-relaxed text-muted">{item.summary}</p>
-            <a
-              href="#contact"
-              className="mt-5 inline-flex min-h-11 items-center gap-1 text-[14px] font-semibold text-amber transition-colors duration-200 hover:text-white"
+            <button
+              type="button"
+              onClick={(event) => openAdmission(event.currentTarget, item.title)}
+              aria-label={`View ${item.title} pathway`}
+              className="mt-5 inline-flex min-h-11 items-center gap-1 text-[14px] font-semibold text-amber transition-colors duration-200 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber"
             >
               View Pathway
               <ArrowRight className="size-4" aria-hidden="true" />
-            </a>
+            </button>
           </li>
         ))}
       </ul>

@@ -11,7 +11,28 @@
 /** Primary number — the one shown in the header and the Contact section. */
 export const PHONE_DISPLAY = '+91 7025 719 000'
 export const PHONE_DIGITS = '917025719000'
-export const TEL_HREF = `tel:+${PHONE_DIGITS}`
+
+/** Dialable target: country code and digits only, so no spaces to mis-dial. */
+export const PHONE_TEL = `+${PHONE_DIGITS}`
+
+/** Alias of `PHONE_TEL`, so existing `tel:` call sites still read clearly. */
+export const TEL_HREF = PHONE_TEL
+
+/**
+ * WhatsApp's `wa.me` expects the country code and digits with no `+`, which is
+ * the same as `PHONE_DIGITS`.
+ */
+export const WHATSAPP_NUMBER = PHONE_DIGITS
+
+/**
+ * Prefilled WhatsApp chat link.
+ *
+ * The message is run through `encodeURIComponent` because it contains a space
+ * and an apostrophe, neither of which is legal unencoded in a query string.
+ */
+export function whatsappLink(message: string): string {
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`
+}
 
 /** Second line — footer contact column only. */
 export const PHONE_ALT_DISPLAY = '+91 7025 729 000'

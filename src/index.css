@@ -269,36 +269,55 @@
   }
 
   /* ------------------------------------------------------------------------
-     Enquiry dialog geometry.
+     Enquiry dialog.
 
      Scoped to `.connect-panel` rather than overriding `.field-light` itself,
      because the contact form shares that class and must keep its own sizing.
-     72px/18px on desktop; 56px/16px on phones, where anything under 16px makes
-     iOS Safari zoom the viewport on focus.
      ------------------------------------------------------------------------ */
+  .connect-panel {
+    /* Hide the bar but keep the scroll: wheel, trackpad and touch all still
+       work, and the zero-width bar leaves no gutter to clip the rounded
+       corners, so no compensating padding is needed. */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    /* Stops the panel's scroll chaining to the page behind it once it hits
+       the end, which otherwise slides the landing page under the backdrop. */
+    overscroll-behavior: contain;
+  }
+
+  .connect-panel::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  /* 16px is the floor: anything smaller makes iOS Safari zoom the viewport the
+     moment a field takes focus. */
   .connect-panel .field-light {
-    min-height: 72px;
-    border-radius: 8px;
-    font-size: 18px;
+    height: 48px;
+    min-height: 48px;
+    padding: 0 16px;
+    border-radius: 10px;
+    font-size: 16px;
   }
 
   @media (width < 769px) {
     .connect-panel .field-light {
-      min-height: 56px;
-      font-size: 16px;
+      height: 46px;
+      min-height: 46px;
     }
   }
 
   .connect-panel .field-label {
-    margin-bottom: 8px;
-    font-size: 20px;
+    margin-bottom: 6px;
+    font-size: 15px;
     font-weight: 500;
     color: #fff;
   }
 
   @media (width < 769px) {
     .connect-panel .field-label {
-      font-size: 16px;
+      font-size: 14px;
     }
   }
 
