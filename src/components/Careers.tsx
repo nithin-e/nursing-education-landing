@@ -2,7 +2,7 @@ import { useCallback, useRef } from 'react'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 
 import { CAREER_ITEMS } from '@/data/nursingData'
-import { useEnquiryModal } from './EnquiryModalProvider'
+import { openDetail } from './DetailProvider'
 import Ticker from './Ticker'
 import Section from './ui/Section'
 import SectionHeading from './ui/SectionHeading'
@@ -15,9 +15,16 @@ import SectionHeading from './ui/SectionHeading'
  * has exactly three career items, and four empty slots would look like missing
  * content. Add a fourth `CAREER_ITEMS` entry and widen the grid if more land.
  */
+
+/** Detail ids keyed on card title, so reordering the array cannot mispair them. */
+const CAREER_IDS: Record<string, string> = {
+  'Nursing Specializations': 'nursing-specializations',
+  'Career Development': 'career-development',
+  'International Opportunities': 'international-opportunities',
+}
+
 export default function Careers() {
   const trackRef = useRef<HTMLUListElement>(null)
-  const { openAdmission } = useEnquiryModal()
 
   const scrollByPage = useCallback((direction: -1 | 1) => {
     const track = trackRef.current
@@ -75,7 +82,9 @@ export default function Careers() {
             <p className="mt-3 text-[15px] leading-relaxed text-muted">{item.summary}</p>
             <button
               type="button"
-              onClick={(event) => openAdmission(event.currentTarget, item.title)}
+              onClick={(event) =>
+                openDetail(CAREER_IDS[item.title] ?? '', event.currentTarget)
+              }
               aria-label={`View ${item.title} pathway`}
               className="mt-5 inline-flex min-h-11 items-center gap-1 text-[14px] font-semibold text-amber transition-colors duration-200 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber"
             >

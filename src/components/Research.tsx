@@ -3,15 +3,26 @@ import { Play } from 'lucide-react'
 import { RESEARCH_ITEMS } from '@/data/nursingData'
 import type { ImageSlot } from '@/data/images'
 import Photo from './ui/Photo'
-import { useEnquiryModal } from './EnquiryModalProvider'
+import { openDetail } from './DetailProvider'
 import Section from './ui/Section'
 import SectionHeading from './ui/SectionHeading'
 
 /** Three different photos, so nothing repeats across the row. */
 const CARD_SLOTS: ImageSlot[] = ['researchCard1', 'researchCard2', 'researchCard3']
 
+/**
+ * Detail ids, in the same order as `RESEARCH_ITEMS`.
+ *
+ * Keyed on the card title rather than on the array index, so reordering
+ * `RESEARCH_ITEMS` cannot silently pair a photo with the wrong detail.
+ */
+const RESEARCH_IDS: Record<string, string> = {
+  'Nursing Research': 'nursing-research',
+  'Evidence-Based Practice': 'evidence-based-practice',
+  'Healthcare Innovation': 'healthcare-innovation',
+}
+
 export default function Research() {
-  const { openAdmission } = useEnquiryModal()
   return (
     /* Pairs with Careers' reduced `pb`: 64px here plus its 32px gives the 96px
        gap under the ticker, instead of two full `.section-pad` blocks. */
@@ -42,7 +53,9 @@ export default function Research() {
 
               <button
                 type="button"
-                onClick={(event) => openAdmission(event.currentTarget, item.title)}
+                onClick={(event) =>
+                  openDetail(RESEARCH_IDS[item.title] ?? '', event.currentTarget)
+                }
                 aria-label={`Explore ${item.title}`}
                 className="mt-5 inline-flex min-h-11 items-center gap-1 text-[14px] font-semibold text-amber transition-colors duration-200 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber"
               >

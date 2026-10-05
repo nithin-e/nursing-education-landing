@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 
-import ConnectModal, { CARD_SOURCE } from './ui/ConnectModal'
+import ConnectModal, { DETAIL_SOURCE } from './ui/ConnectModal'
 import type { ConnectModalMode } from './ui/ConnectModal'
 
 /** Lead source for entry points that are not tied to a content card. */
@@ -27,9 +27,13 @@ type EnquiryModalContextValue = {
   /**
    * Opens the sign-up form behind every "Get Admission" button.
    *
-   * Pass the card title as `interest` when a content card's CTA opens it: the
-   * heading is unchanged, but the lead records both `source` and `interest` so
-   * the backend knows which card the visitor was reading.
+   * Pass the item title as `interest` when a detail panel's "Talk to our team"
+   * opens it: the heading is unchanged, but the lead records `source` and
+   * `interest` so the backend knows which item the visitor was reading.
+   *
+   * `trigger` is the button that opened the dialog, so focus returns to it on
+   * close. Pass `null` when the caller is already tearing down another dialog -
+   * the detail panel does exactly that before handing over.
    */
   openAdmission: (trigger: HTMLButtonElement | null, interest?: string) => void
   /** Opens the connect form behind a person card's Message button. */
@@ -76,7 +80,7 @@ export function EnquiryModalProvider({ children }: { children: ReactNode }) {
       mode: 'admission',
       personName: null,
       interest: interest ?? null,
-      source: interest ? CARD_SOURCE : ADMISSION_SOURCE,
+      source: interest ? DETAIL_SOURCE : ADMISSION_SOURCE,
     })
   }, [])
 

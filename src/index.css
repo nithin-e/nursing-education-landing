@@ -390,6 +390,80 @@
   }
 
   /* ------------------------------------------------------------------------
+     Detail panel.
+
+     A right-hand drawer from 769px, a full-screen sheet below it, on the same
+     breakpoint as the enquiry dialog. Reduced motion keeps the opacity fade and
+     drops the slide, which is the movement most likely to trouble someone.
+     ------------------------------------------------------------------------ */
+  .detail-backdrop {
+    animation: detail-fade 200ms ease both;
+  }
+
+  .detail-panel {
+    /* Hidden bar, working scroll - the same treatment as `.connect-panel`, and
+       for the same reason: a visible bar eats width the copy needs at 320px. */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    /* Stops the sheet's scroll chaining to the page behind it. */
+    overscroll-behavior: contain;
+    animation: detail-rise 250ms ease-out both;
+  }
+
+  .detail-panel::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  @media (width >= 769px) {
+    .detail-panel {
+      animation-name: detail-slide;
+    }
+  }
+
+  @keyframes detail-fade {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes detail-rise {
+    from {
+      opacity: 0;
+      transform: translateY(100%);
+    }
+
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes detail-slide {
+    from {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .detail-backdrop,
+    .detail-panel {
+      animation: detail-fade 150ms ease-out both;
+    }
+  }
+
+  /* ------------------------------------------------------------------------
      Hero entrance. A single 400ms opacity fade that plays on load — no
      transform, no stagger, no scroll trigger, and nothing else animating.
      ------------------------------------------------------------------------ */

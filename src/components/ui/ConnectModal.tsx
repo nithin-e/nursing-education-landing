@@ -3,6 +3,7 @@ import type { ChangeEvent, FormEvent, KeyboardEvent, ReactNode } from 'react'
 import { Check, ChevronDown, X } from 'lucide-react'
 
 import { EMAIL_PATTERN } from './ContactForm'
+import { CONSENT_TEXT } from '@/data/site'
 import submitEnquiry from '@/lib/submitEnquiry'
 import type { EnquiryPayload } from '@/lib/submitEnquiry'
 
@@ -22,8 +23,20 @@ const EDUCATION_OPTIONS = [
 /** Lead source recorded when the form is opened by a "Get Admission" button. */
 const ADMISSION_SOURCE = 'get-admission'
 
-/** Lead source recorded when a content card's CTA opens the form. */
-export const CARD_SOURCE = 'resources'
+/**
+ * Lead source recorded when the detail panel's "Talk to our team" opens the form.
+ *
+ * The four card groups now open a detail view first, so this is no longer tagged
+ * by which card was read - `source` says the visitor came through the detail
+ * panel, and `interest` carries the specific item's title.
+ */
+export const DETAIL_SOURCE = 'detail'
+
+/** Short agreement line beside the checkbox. The longer explanation sits under
+ * the submit button, so the tick target stays a single short row.
+ */
+const CONSENT_LABEL = 'I agree to be contacted about my enquiry.'
+const CONSENT_ERROR = 'Please tick the box to continue.'
 
 type Fields = {
   name: string
@@ -32,13 +45,23 @@ type Fields = {
   mobile: string
   education: string
   place: string
+  /** Boolean, not a string: the payload records permission, not checkbox state. */
+  consent: boolean
 }
 
 type FieldKey = keyof Fields
 
 type Errors = Partial<Record<FieldKey, string>>
 
-const EMPTY: Fields = { name: '', email: '', countryCode: '+91', mobile: '', education: '', place: '' }
+const EMPTY: Fields = {
+  name: '',
+  email: '',
+  countryCode: '+91',
+  mobile: '',
+  education: '',
+  place: '',
+  consent: false,
+}
 
 /** 10 digits for India; looser elsewhere because codes differ in length. */
 function validate(fields: Fields): Errors {
@@ -57,6 +80,10 @@ function validate(fields: Fields): Errors {
   else if (digits.length < 6 || digits.length > 15) errors.mobile = 'Enter a valid mobile number.'
 
   if (!fields.place.trim()) errors.place = 'Please enter your place.'
+
+  /* Checked alongside the text fields, not on blur: it is the one control with no
+     typing to trigger a change, so it has to be validated on submit. */
+  if (!fields.consent) errors.consent = CONSENT_ERROR
 
   return errors
 }
@@ -88,14 +115,14 @@ export type ConnectModalProps = {
   /** Card the visitor clicked. `null` in `admission` mode. */
   personName: string | null
   /**
-   * Title of the card whose CTA opened the dialog, e.g. `Nursing Education`.
-   * Recorded so the backend knows what the visitor was reading, without
-   * changing the heading.
+   * Title of the detail item the visitor was reading, e.g. `Nursing Education`.
+   * Recorded so the backend knows what they were looking at, without changing
+   * the heading.
    */
   interest?: string | null
   /**
-   * Lead source for `admission` entries. Defaults to the header/CTA value;
-   * content cards pass `CARD_SOURCE`.
+   * Lead source for `admission` entries. Defaults to the header/CTA value; the
+   * detail panel passes `DETAIL_SOURCE`.
    */
   source?: string
   /**
@@ -133,6 +160,7 @@ export default function ConnectModal({
 
   const panelRef = useRef<HTMLDivElement>(null)
   const nameRef = useRef<HTMLInputElement>(null)
+const consentRef = useRef<HTMLInputElement>(null)
 
   /* Fresh form each time it opens. */
   useEffect(() => {
@@ -207,8 +235,16 @@ export default function ConnectModal({
     [onClose],
   )
 
+  /* Checkbox needs its own handler: its value is a boolean, where the text fields
+     all carry strings. */
+  const handleConsentChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setFields((previous) => ({ ...previous, consent: event.target.checked }))
+    setErrors((previous) => ({ ...previous, consent: undefined }))
+    setSent(false)
+  }
+
   const handleChange =
-    (field: FieldKey) =>
+    (field: Exclude<FieldKey, 'consent'>) =>
     (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
       setFields((previous) => ({ ...previous, [field]: event.target.value }))
       setErrors((previous) => ({ ...previous, [field]: undefined }))
@@ -223,7 +259,10 @@ export default function ConnectModal({
     setTouched(true)
 
     if (Object.keys(nextErrors).length > 0) {
-      const firstBad = (['name', 'email', 'mobile', 'place'] as FieldKey[]).find(
+      /* Consent is last in this list, so focus only lands on it when nothing
+         above is wrong - the visitor is walked through the form in order rather
+         than bounced to the bottom. */
+      const firstBad = (['name', 'email', 'mobile', 'place', 'consent'] as FieldKey[]).find(
         (key) => nextErrors[key],
       )
       if (firstBad) panelRef.current?.querySelector<HTMLElement>(`#enquiry-${firstBad}`)?.focus()
@@ -244,6 +283,7 @@ export default function ConnectModal({
       mobile: fields.mobile.replace(/\D/g, ''),
       education: fields.education,
       place: fields.place.trim(),
+      consent: fields.consent,
     }
 
     try {
@@ -471,6 +511,42 @@ export default function ConnectModal({
                 ) : null}
               </div>
 
+              {/* Consent sits directly above the submit button, so the box and
+                  the action it gates read as one pair. The 44px `py-3.5` lane is
+                  the tap target; the visible box stays 20px. */}
+              <div className="mt-1">
+                <div className="flex items-start gap-3">
+                  <input
+                    ref={consentRef}
+                    id="enquiry-consent"
+                    name="consent"
+                    type="checkbox"
+                    checked={fields.consent}
+                    onChange={handleConsentChange}
+                    aria-invalid={errorFor('consent') ? true : undefined}
+                    aria-describedby={
+                      errorFor('consent')
+                        ? 'enquiry-consent-error'
+                        : 'enquiry-consent-note'
+                    }
+                    className="mt-0.5 size-5 shrink-0 accent-amber"
+                  />
+
+                  <label
+                    htmlFor="enquiry-consent"
+                    className="-my-1 flex-1 cursor-pointer py-3.5 text-[14px] leading-snug text-white/90"
+                  >
+                    {CONSENT_LABEL}
+                  </label>
+                </div>
+
+                {errorFor('consent') ? (
+                  <p id="enquiry-consent-error" className="mt-1 text-[13px] text-red-400">
+                    {errorFor('consent')}
+                  </p>
+                ) : null}
+              </div>
+
               <button
                 type="submit"
                 disabled={submitting}
@@ -478,6 +554,16 @@ export default function ConnectModal({
               >
                 {submitting ? 'Submitting...' : isAdmission ? 'Sign up' : 'Submit'}
               </button>
+
+              {/* Below the action, so it reads as a condition of submitting rather
+                  than as a field to fill in. Left-aligned on desktop, centred on
+                  a phone where the panel is a narrow single column. */}
+              <p
+                id="enquiry-consent-note"
+                className="mt-3 text-center text-[13px] leading-[1.5] text-muted min-[769px]:text-left"
+              >
+                {CONSENT_TEXT}
+              </p>
             </form>
           </>
         )}

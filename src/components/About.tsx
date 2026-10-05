@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 import { ABOUT_ROWS, ABOUT_TEXT, STATS } from '@/data/nursingData'
 import { cn } from '@/lib/cn'
-import { useEnquiryModal } from './EnquiryModalProvider'
+import scrollToSection from '@/lib/scrollToSection'
 import Photo from './ui/Photo'
 import Section from './ui/Section'
 import SectionHeading from './ui/SectionHeading'
@@ -16,7 +16,6 @@ import Button from './ui/Button'
  */
 export default function About() {
   const [photoMissing, setPhotoMissing] = useState(false)
-  const { openAdmission } = useEnquiryModal()
 
   return (
     <Section id="about">
@@ -44,8 +43,8 @@ export default function About() {
           <SectionHeading
             align="left"
             label="About us"
-            title="Built by nurses, for nurses"
-            emphasis={['nurses']}
+            title="Supporting the future of nursing"
+            emphasis={['future of nursing']}
             description={ABOUT_TEXT}
           />
 
@@ -63,10 +62,10 @@ export default function About() {
           </dl>
 
           <div className="mt-8">
-            <Button
-              variant="primary"
-              onClick={(event) => openAdmission(event.currentTarget)}
-            >
+            {/* Goes to the contact section, which is the thing the label
+                promises. It used to open the sign-up dialog, so a visitor
+                looking for contact details got a marketing form instead. */}
+            <Button variant="primary" onClick={() => scrollToSection('contact')}>
               Contact Us
             </Button>
           </div>

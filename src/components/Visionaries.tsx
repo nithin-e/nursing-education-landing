@@ -112,7 +112,7 @@ export default function Visionaries() {
         <SectionLabel>Meet the team</SectionLabel>
 
         <h2 className="mt-4 max-w-[900px] text-[clamp(1.875rem,4vw,3.25rem)] leading-[1.15] font-light text-white">
-          The <span className="font-extrabold">Visionaries</span> - Meet the Leaders Behind Dr.
+          The <span className="font-extrabold">Visionaries</span> - Meet the Leaders Behind Dr
           Expert Edulinks
         </h2>
       </div>

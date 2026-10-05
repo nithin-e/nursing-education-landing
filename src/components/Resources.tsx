@@ -1,15 +1,21 @@
 import { ArrowRight } from 'lucide-react'
 
 import { RESOURCE_ITEMS } from '@/data/nursingData'
-import { useEnquiryModal } from './EnquiryModalProvider'
+import { openDetail } from './DetailProvider'
 import Photo from './ui/Photo'
 import Section from './ui/Section'
 import SectionHeading from './ui/SectionHeading'
 
+/** Detail ids keyed on card title, so reordering the array cannot mispair them. */
+const RESOURCE_IDS: Record<string, string> = {
+  'Nursing Education': 'nursing-education',
+  'Clinical Practice': 'clinical-practice',
+  'Patient Safety': 'patient-safety',
+  'Professional Development': 'professional-development',
+}
+
 /** Tile grid plus one wide photo banner. */
 export default function Resources() {
-  const { openAdmission } = useEnquiryModal()
-
   return (
     <Section id="resources">
       <SectionHeading
@@ -56,7 +62,9 @@ export default function Resources() {
                   still a single focus stop and no click handler on the <li>. */}
               <button
                 type="button"
-                onClick={(event) => openAdmission(event.currentTarget, item.title)}
+                onClick={(event) =>
+                  openDetail(RESOURCE_IDS[item.title] ?? '', event.currentTarget)
+                }
                 aria-label={`Explore ${item.title}`}
                 className="mt-2.5 inline-flex min-h-11 items-center gap-1 text-[16px] font-semibold text-amber transition-colors duration-200 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber min-[769px]:mt-3 min-[769px]:text-[14px] max-[480px]:after:absolute max-[480px]:after:inset-0 max-[480px]:after:content-['']"
               >

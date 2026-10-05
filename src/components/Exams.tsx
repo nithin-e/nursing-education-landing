@@ -1,14 +1,59 @@
 import { useState } from 'react'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Sparkle } from 'lucide-react'
 
 import { EXAM_DISCLAIMER, EXAM_GLASS_TEXT, EXAM_ITEMS } from '@/data/nursingData'
-import { useEnquiryModal } from './EnquiryModalProvider'
+import type { ListItem } from '@/data/nursingData'
+import { openDetail } from './DetailProvider'
 import Photo from './ui/Photo'
 import Section from './ui/Section'
 import SectionHeading from './ui/SectionHeading'
-import StarList from './ui/StarList'
 import Button from './ui/Button'
 
+/** Detail ids keyed on row title, so reordering the array cannot mispair them. */
+const EXAM_IDS: Record<string, string> = {
+  'Nursing Entrance Exams': 'nursing-entrance-exams',
+  'Licensing Examinations': 'licensing-examinations',
+  'Professional Certifications': 'professional-certifications',
+}
+
+/**
+ * The three exam rows, each one a button.
+ *
+ * The whole row is the control rather than a link inside it: one focus stop, one
+ * 44px-tall tap target, and no nested interactive elements. The yellow "Learn more"
+ * and arrow are part of the button's own content, so the affordance is visible
+ * without becoming a separate target.
+ */
+function ExamRow({ item }: { item: ListItem }) {
+  return (
+    <li className="border-b border-line last:border-b-0">
+      <button
+        type="button"
+        onClick={(event) => openDetail(EXAM_IDS[item.title] ?? '', event.currentTarget)}
+        className="group flex w-full items-start gap-4 py-5 text-left transition-colors duration-200 hover:bg-white/[0.03] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-amber"
+      >
+        <Sparkle className="mt-1 size-4 shrink-0 text-amber" aria-hidden="true" strokeWidth={2} />
+
+        <div className="min-w-0 flex-1">
+          <h3 className="font-display text-lg font-bold text-white">{item.title}</h3>
+          <p className="mt-1 text-[15px] leading-relaxed text-muted">{item.summary}</p>
+
+          <span className="mt-2.5 inline-flex min-h-11 items-center gap-1 text-[14px] font-semibold text-amber transition-colors duration-200 group-hover:text-white">
+            Learn more
+            <ArrowRight className="size-4" aria-hidden="true" />
+          </span>
+        </div>
+      </button>
+    </li>
+  )
+}
+
+/**
+ * Left column is a star list, right column is a two-photo collage. The collage
+ * and the glass card that sits beside the small photo are one unit, so if the
+ * collage's main photo is missing both disappear together rather than leaving a
+ * card stranded next to nothing.
+ */
 /**
  * Left column is a star list, right column is a two-photo collage. The collage
  * and the glass card that sits beside the small photo are one unit, so if the
@@ -17,7 +62,6 @@ import Button from './ui/Button'
  */
 export default function Exams() {
   const [collageFailed, setCollageFailed] = useState(false)
-  const { openAdmission } = useEnquiryModal()
 
   return (
     <Section id="exams" tone="navy">
@@ -31,14 +75,20 @@ export default function Exams() {
             description="From nursing entrance tests to licensing and specialisation certificates, understand what each assessment covers before you sit it."
           />
 
-          <div className="mt-8">
-            <StarList items={EXAM_ITEMS} />
-          </div>
+          <ul className="mt-8 border-t border-line">
+            {EXAM_ITEMS.map((item) => (
+              <ExamRow key={item.title} item={item} />
+            ))}
+          </ul>
 
           <div className="mt-8">
+            {/* The section's main button opens the first exam's detail view, which
+                is where a general "Learn more" question belongs. */}
             <Button
               variant="primary"
-              onClick={(event) => openAdmission(event.currentTarget)}
+              onClick={(event) =>
+                openDetail(EXAM_IDS[EXAM_ITEMS[0].title] ?? '', event.currentTarget)
+              }
               className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
               Learn More
