@@ -1,4 +1,4 @@
-import { MAILTO_HREF, TEL_HREF } from '@/data/contact'
+import { MAILTO_HREF, PHONE_TEL } from '@/data/contact'
 import { SITE } from '@/data/site'
 import ContactForm from './ui/ContactForm'
 import Section from './ui/Section'
@@ -28,7 +28,7 @@ export default function Contact() {
                 <dt className="text-sm text-muted">Phone</dt>
                 <dd className="mt-1">
                   <a
-                    href={TEL_HREF}
+                    href={`tel:${PHONE_TEL}`}
                     className="font-semibold break-words text-white transition-colors duration-200 hover:text-amber"
                   >
                     {SITE.phone}

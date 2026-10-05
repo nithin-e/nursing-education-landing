@@ -8,23 +8,29 @@ import Button from './ui/Button'
 import Logo from './ui/Logo'
 
 /**
- * Yellow circle phone icon plus the number.
+ * Yellow circle phone icon plus the number, as a single link.
+ *
+ * The whole group is one `<a>`, so tapping the circle or the digits starts the
+ * call; wrapping only the circle would leave the number tappable but inert.
  *
  * The number is about 130px wide, which does not fit beside the logo and the
- * "Get Admission" button at 360px, so below `lg` the circle stands alone as a
- * 44px `tel:` target and the digits appear from `lg` up. The `aria-label` keeps
- * the icon-only state announced.
+ * "Get Admission" button at 360px, so below `lg` the circle stands alone and the
+ * digits appear from `lg` up. The `aria-label` keeps the icon-only state
+ * announced. `min-h-11` holds the tap target at 44px even once the circle
+ * shrinks to 40px at `lg`.
  *
  * The digits come from `PHONE_DISPLAY` and the dial target from `PHONE_TEL`, so
- * the printed number and the dialled one cannot drift apart.
+ * the printed number and the dialled one cannot drift apart. The `tel:` scheme is
+ * added here rather than in the constant — a bare "+917025719000" href is read by
+ * the browser as a relative path, which navigates instead of dialling.
  */
 function PhoneLink({ className = '' }: { className?: string }) {
   return (
     <a
-      href={PHONE_TEL}
-      aria-label={`Call ${PHONE_DISPLAY}`}
+      href={`tel:${PHONE_TEL}`}
+      aria-label={`Call us at ${PHONE_DISPLAY}`}
       className={cn(
-        'flex min-h-11 shrink-0 items-center gap-3 text-white transition-colors duration-200 hover:text-amber',
+        'flex min-h-11 shrink-0 items-center gap-3 text-white no-underline transition-colors duration-200 hover:text-amber focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber',
         className,
       )}
     >

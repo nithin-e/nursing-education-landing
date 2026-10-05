@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react'
 
 import { CAREER_ITEMS } from '@/data/nursingData'
 import { useEnquiryModal } from './EnquiryModalProvider'
-import Photo from './ui/Photo'
+import Ticker from './Ticker'
 import Section from './ui/Section'
 import SectionHeading from './ui/SectionHeading'
 
@@ -27,7 +27,11 @@ export default function Careers() {
   }, [])
 
   return (
-    <Section id="careers">
+    /* Both this section and Research are black, so their `.section-pad` bottom
+       and top used to stack into 192px of featureless void under the ticker.
+       Overriding one side of each halves that: 32 + 64 = 96px. The utilities
+       layer beats `.section-pad` in `@layer components`. */
+    <Section id="careers" className="pb-6 md:pb-8">
       <SectionHeading
         label="Nursing careers"
         title="Build your nursing career"
@@ -82,14 +86,9 @@ export default function Careers() {
         ))}
       </ul>
 
-      <div className="mt-8" data-fade="">
-        <Photo
-          slot="careersStrip"
-          alt="Nurse providing hands-on care to a patient"
-          className="h-[180px] md:h-[220px]"
-          useRatio={false}
-        />
-      </div>
+      {/* The photo that used to sit here is gone; the strip carries the section
+          footer instead. */}
+      <Ticker className="mt-7 md:mt-10" fade />
     </Section>
   )
 }
