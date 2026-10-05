@@ -29,6 +29,14 @@ export type EnquiryPayload = {
   mobile: string
   education: string
   place: string
+  /**
+   * The visitor ticked the agreement to be contacted.
+   *
+   * Recorded rather than merely displayed, because a contact-permission flag is
+   * the one part of a lead record a backend needs in order to be defensible.
+   * Required by both lead forms, so it is non-optional here.
+   */
+  consent: boolean
 }
 
 export default function submitEnquiry(payload: EnquiryPayload): Promise<EnquiryPayload> {

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ChevronDown } from 'lucide-react'
 
 import { PHONE_TEL, whatsappLink } from '@/data/contact'
@@ -99,6 +99,30 @@ function FaqRow({ item, isOpen, onToggle }: { item: (typeof FAQ_ITEMS)[number]; 
  */
 export default function Faq() {
   const [openId, setOpenId] = useState<string | null>(FAQ_ITEMS[0]?.id ?? null)
+
+  /* A `#faq-<id>` link, from the Exams button or from a shared URL, opens that
+     row. The handler is read on mount and on every hashchange, which covers both
+     a fresh page load and the same page.
+
+     `scrollToSection` sets the hash with `replaceState`, which does not fire
+     `hashchange`, so the Exams button relies on the second `openFromHash` call
+     below rather than on this listener alone. */
+  useEffect(() => {
+    const openFromHash = () => {
+      const hash = window.location.hash.replace(/^#/, '')
+      if (!hash.startsWith('faq-')) return
+
+      /* Matches the item's own slug first, then any shorter alias, so both
+         `#faq-exams-and-certifications` and `#faq-exams` open this row. */
+      const match = FAQ_ITEMS.find((item) => `faq-${item.id}` === hash || item.hash === hash)
+      if (match) setOpenId(match.id)
+    }
+
+    openFromHash()
+    window.addEventListener('hashchange', openFromHash)
+
+    return () => window.removeEventListener('hashchange', openFromHash)
+  }, [])
 
   return (
     <Section id="faq" tone="navy">

@@ -129,7 +129,7 @@ export default function Footer() {
           </div>
 
           <p className="text-[15px] text-white min-[769px]:text-[20px]">
-            &copy;2026 Dr. Expert Edulinks. All Rights Reserved.
+            &copy;2026 Dr Expert Edulinks. All Rights Reserved.
           </p>
         </div>
       </div>

@@ -2,23 +2,54 @@
 <html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
-    <!-- Favicon: Dr Expert logo -->
-    <link rel="icon" type="image/png" sizes="32x32" href="/images/dr-expert/logo.webp" />
-    <link rel="icon" type="image/png" sizes="192x192" href="/images/dr-expert/logo.webp" />
+    <!-- Favicon: Dr Expert logo. The asset is WebP, so the declared type has to match. -->
+    <link rel="icon" type="image/webp" sizes="32x32" href="/images/dr-expert/logo.webp" />
+    <link rel="icon" type="image/webp" sizes="192x192" href="/images/dr-expert/logo.webp" />
     <link rel="apple-touch-icon" href="/images/dr-expert/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#000000" />
-    <title>Dr Expert Edulinks — Be a doctor by doctors</title>
+    <title>Dr Expert Edulinks | Nursing Education &amp; Career Guidance</title>
 
-    
-    <!-- keep the rest of your head (description, fonts) unchanged -->
     <meta
       name="description"
       content="Dr Expert Edulinks is a nursing education and professional development platform offering learning resources, clinical guidance, exam and certification information, career pathways and research."
     />
+
+    <!--
+      Sharing tags. index.html cannot import from src/data/site.ts, so these values
+      are written out here and must be kept in step with those constants:
+        SITE_URL    https://nursing-education-landing.vercel.app
+        SITE_TITLE  Dr Expert Edulinks | Nursing Education & Career Guidance
+      og:description is the same string as the meta description above.
+    -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Dr Expert Edulinks" />
+    <meta property="og:title" content="Dr Expert Edulinks | Nursing Education &amp; Career Guidance" />
+    <meta
+      property="og:description"
+      content="Dr Expert Edulinks is a nursing education and professional development platform offering learning resources, clinical guidance, exam and certification information, career pathways and research."
+    />
+    <meta property="og:url" content="https://nursing-education-landing.vercel.app" />
+    <!-- Replace with a 1200x630 share image. Absolute URL required: og:image ignores relative paths. -->
+    <meta
+      property="og:image"
+      content="https://nursing-education-landing.vercel.app/images/dr-expert/logo.webp"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Dr Expert Edulinks | Nursing Education &amp; Career Guidance" />
+    <meta
+      name="twitter:description"
+      content="Dr Expert Edulinks is a nursing education and professional development platform offering learning resources, clinical guidance, exam and certification information, career pathways and research."
+    />
+    <meta
+      name="twitter:image"
+      content="https://nursing-education-landing.vercel.app/images/dr-expert/logo.webp"
+    />
+    <link rel="canonical" href="https://nursing-education-landing.vercel.app" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- Display: Exo 2 (300-800, mixed-weight headlines) · Body: DM Sans -->
+    <!-- Display: Exo 2 (300-800, mixed-weight headlines); Body: DM Sans -->
     <link
       rel="preload"
       as="style"

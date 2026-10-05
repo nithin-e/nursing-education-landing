@@ -6,6 +6,12 @@
 export type FaqItem = {
   /** Slug, used to build the `id`, `aria-controls` and `aria-labelledby` pairs. */
   id: string
+  /**
+   * Optional shorter deep-link, matched alongside `id` when the section reads the
+   * URL hash. It exists so an inbound link can stay readable
+   * (`#faq-exams`) without shortening the slug the accessibility ids use.
+   */
+  hash?: string
   question: string
   answer: string
 }
@@ -19,6 +25,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   },
   {
     id: 'exams-and-certifications',
+    hash: 'faq-exams',
     question: 'Which nursing exams and certifications can I get guidance on?',
     answer:
       'We share general information on nursing entrance exams, licensing examinations and professional certifications, including formats, application stages and preparation tips.',

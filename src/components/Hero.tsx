@@ -5,7 +5,7 @@ import { Phone, Sparkle } from 'lucide-react'
 import { HERO_HEADLINE, HERO_HEADLINE_2, HERO_LABEL, HERO_TEXT } from '@/data/nursingData'
 import { PHONE_DISPLAY, PHONE_TEL, whatsappLink } from '@/data/contact'
 import { getImage, resolvePhoto, type ImageSlot } from '@/data/images'
-import { SITE } from '@/data/site'
+import { TAGLINE } from '@/data/site'
 import Button from './ui/Button'
 
 /** Opening line carried into the WhatsApp chat. */
@@ -92,7 +92,7 @@ export default function Hero() {
       <div className="container-page hero-intro">
         <p className="mx-auto inline-flex items-center gap-2 rounded-pill border border-amber/50 px-4 py-2 text-[13px] font-semibold tracking-[0.12em] text-amber uppercase">
           <Sparkle className="size-3.5 shrink-0" aria-hidden="true" strokeWidth={2} />
-          {SITE.tagline}
+          {TAGLINE}
         </p>
 
         <h1 className="mt-8 text-[clamp(34px,9.5vw,44px)] leading-[1.05] font-light text-white md:text-[clamp(40px,6vw,84px)]">

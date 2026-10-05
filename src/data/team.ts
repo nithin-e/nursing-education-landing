@@ -2,6 +2,14 @@
  * Bios are shortened; confirm wording and facts with Dr Expert before publishing.
  */
 
+/**
+ * Set to true only after real, approved nursing leadership bios are added.
+ *
+ * While this is false the section that would mount `TEAM` renders
+ * `GuidanceSteps` instead, so no MBBS or doctor biography reaches the page.
+ */
+export const SHOW_TEAM = false
+
 export type TeamMember = {
   id: string
   name: string
