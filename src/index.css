@@ -152,30 +152,44 @@
       border-color: var(--color-amber);
     }
   }
+/* ------------------------------------------------------------------------
+     Ticker — one slow loop over a track built from two identical groups, so
+     translating the track by -50% lands exactly on the start of the second.
 
-  /* ------------------------------------------------------------------------
-     Slim ticker — one slow 60s loop over a track rendered twice, so the
-     -50% translate loops seamlessly.
+     Track geometry lives here rather than as utilities on the element: reduced
+     motion has to replace `width: max-content` with a wrapping row, and this
+     block sits in `@layer components`, which Tailwind's utility layer would
+     otherwise win against.
      ------------------------------------------------------------------------ */
   @keyframes ticker-scroll {
     from {
       transform: translateX(0);
     }
+
     to {
       transform: translateX(-50%);
     }
   }
 
-  /* Owned here rather than as a utility on the element, so the reduced-motion
-     block below can switch it to a scrollable strip. */
   .ticker {
     overflow: hidden;
   }
 
   .ticker-track {
-    animation: ticker-scroll 60s linear infinite;
+    display: flex;
+    align-items: center;
+    width: max-content;
+    animation: ticker-scroll 40s linear infinite;
   }
 
+  @media (width < 769px) {
+    .ticker-track {
+      animation-duration: 32s;
+    }
+  }
+
+  /* `@media (hover: hover)` so a tap on a phone does not latch the strip
+     paused for the rest of the session. */
   @media (hover: hover) {
     .ticker:hover .ticker-track {
       animation-play-state: paused;
@@ -183,14 +197,18 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    /* Drop the animation but keep every phrase reachable by scrolling, rather
-       than clipping the overflow-hidden strip down to its first few items. */
-    .ticker {
-      overflow-x: auto;
+    /* Stop the loop and lay the phrases out as a centred wrapped block. The
+       duplicate group is dropped outright: with no loop there is no seam for it
+       to hide, so it would only read as every phrase appearing twice. */
+    .ticker-track {
+      width: auto;
+      flex-wrap: wrap;
+      justify-content: center;
+      animation: none;
     }
 
-    .ticker-track {
-      animation: none;
+    .ticker-group-duplicate {
+      display: none;
     }
   }
 

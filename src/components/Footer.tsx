@@ -6,8 +6,8 @@ import {
   MAILTO_HREF,
   PHONE_ALT_DISPLAY,
   PHONE_DISPLAY,
-  TEL_ALT_HREF,
-  TEL_HREF,
+  PHONE_TEL,
+  PHONE_TEL_2,
 } from '@/data/contact'
 import { NAV_LINKS, SOCIAL_LINKS } from '@/data/site'
 import { BRAND_ICONS } from './ui/BrandIcons'
@@ -82,13 +82,13 @@ export default function Footer() {
               <div>
                 <p className="font-bold text-white">Phone</p>
                 <a
-                  href={TEL_HREF}
+                  href={`tel:${PHONE_TEL}`}
                   className="block text-muted transition-colors duration-200 hover:text-amber"
                 >
                   {PHONE_DISPLAY}
                 </a>
                 <a
-                  href={TEL_ALT_HREF}
+                  href={`tel:${PHONE_TEL_2}`}
                   className="block text-muted transition-colors duration-200 hover:text-amber"
                 >
                   {PHONE_ALT_DISPLAY}

@@ -12,11 +12,14 @@
 export const PHONE_DISPLAY = '+91 7025 719 000'
 export const PHONE_DIGITS = '917025719000'
 
-/** Dialable target: country code and digits only, so no spaces to mis-dial. */
+/** Dialable target: country code and digits only, so no spaces to mis-dial.
+ *
+ * The `tel:` scheme is deliberately NOT baked in here. Call sites write
+ * `href={`tel:${PHONE_TEL}`}`, because a constant that looks like a finished href
+ * but silently lacks the scheme resolves as a relative URL — the browser then
+ * treats "+917025719000" as a path and navigates to it instead of dialling.
+ */
 export const PHONE_TEL = `+${PHONE_DIGITS}`
-
-/** Alias of `PHONE_TEL`, so existing `tel:` call sites still read clearly. */
-export const TEL_HREF = PHONE_TEL
 
 /**
  * WhatsApp's `wa.me` expects the country code and digits with no `+`, which is
@@ -37,7 +40,7 @@ export function whatsappLink(message: string): string {
 /** Second line — footer contact column only. */
 export const PHONE_ALT_DISPLAY = '+91 7025 729 000'
 export const PHONE_ALT_DIGITS = '917025729000'
-export const TEL_ALT_HREF = `tel:+${PHONE_ALT_DIGITS}`
+export const PHONE_TEL_2 = `+${PHONE_ALT_DIGITS}`
 
 export const EMAIL = 'info@drexpertedu.com'
 export const MAILTO_HREF = `mailto:${EMAIL}`

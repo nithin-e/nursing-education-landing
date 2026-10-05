@@ -13,7 +13,9 @@ const CARD_SLOTS: ImageSlot[] = ['researchCard1', 'researchCard2', 'researchCard
 export default function Research() {
   const { openAdmission } = useEnquiryModal()
   return (
-    <Section id="research">
+    /* Pairs with Careers' reduced `pb`: 64px here plus its 32px gives the 96px
+       gap under the ticker, instead of two full `.section-pad` blocks. */
+    <Section id="research" className="pt-12 md:pt-16">
       <SectionHeading
         label="Research &amp; evidence"
         title="Turn evidence into better care"

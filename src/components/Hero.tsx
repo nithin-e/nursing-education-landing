@@ -127,7 +127,7 @@ export default function Hero() {
             Whatsapp Us
           </Button>
           <Button
-            href={PHONE_TEL}
+            href={`tel:${PHONE_TEL}`}
             variant="outline"
             aria-label={`Call us at ${PHONE_DISPLAY}`}
             className="h-[52px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber min-[769px]:h-14"

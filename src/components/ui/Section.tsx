@@ -21,6 +21,11 @@ export type SectionProps = {
  * Every band on the page. One wrapper guarantees the background, the 56/96px
  * vertical rhythm, the 1200px measure and the `scroll-mt` offset that smooth
  * anchor navigation needs to clear the sticky header.
+ *
+ * `className` is the per-section seam control: passing `pb-*`/`pt-*` overrides
+ * just that one edge of the rhythm, which is what stops two same-coloured
+ * sections from stacking into a void. The utilities win over `.section-pad`
+ * because Tailwind emits its utilities layer after components.
  */
 export default function Section({ id, tone = 'black', className = '', children }: SectionProps) {
   return (
