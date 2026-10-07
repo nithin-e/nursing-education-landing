@@ -46,4 +46,27 @@ export const EMAIL = 'info@drexpertedu.com'
 export const MAILTO_HREF = `mailto:${EMAIL}`
 
 /** Postal address, set as one string so it wraps naturally in narrow columns. */
-export const ADDRESS = '63/4942 B, Ground Floor, Karadan Square, Cherootty Nagar, Calicut, 673004'
+export const ADDRESS =
+  '2nd Floor, Kottaram - Nadakkavu Rd, Ashokapuram, RdJN, Nadakkave, Kozhikode, Kerala 673006'
+
+/**
+ * Taken from the Google Maps listing. Confirm with Dr Expert whether this
+ * replaces the old Cherootty Nagar address.
+ */
+
+/**
+ * Directions link. Opens the place in a new tab rather than an embedded viewer,
+ * because the embed is deliberately kept to a map frame while this is the way
+ * out to turn-by-turn navigation.
+ */
+export const MAPS_URL =
+  'https://maps.google.com/maps/place//data=!4m2!3m1!1s0x3ba659c3ac90d9cb:0x2be6a23011a5ae7a?entry=s&sa=X&ved=2ahUKEwierrTBiqOXAxUJieEIHTN3ACIQ4kB6BAgXEAA&hl=en'
+
+/**
+ * Embedded map, for the `iframe` src in the Contact section's location card.
+ *
+ * If the map shows blank, use Google Maps > Share > Embed a map and paste the
+ * iframe src here.
+ */
+export const MAP_EMBED_URL =
+  'https://maps.google.com/maps?q=11.2707254,75.7804424&z=17&output=embed'

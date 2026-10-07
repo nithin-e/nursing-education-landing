@@ -1,9 +1,11 @@
 import { Fragment } from 'react'
+import { ArrowUpRight } from 'lucide-react'
 
 import {
   ADDRESS,
   EMAIL,
   MAILTO_HREF,
+  MAPS_URL,
   PHONE_ALT_DISPLAY,
   PHONE_DISPLAY,
   PHONE_TEL,
@@ -66,7 +68,33 @@ export default function Footer() {
             <div className="flex flex-col gap-[18px] text-[18px] leading-[1.6]">
               <div>
                 <p className="font-bold text-white">Address</p>
-                <p className="text-muted">{ADDRESS}</p>
+
+                {/* The address links out to the map. `inline-block` plus a
+                    following block element keeps the "View on map" link on its
+                    own line without an extra margin, and `[overflow-wrap:anywhere]`
+                    stops a long place name forcing the column wider. */}
+                <a
+                  href={MAPS_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Open the office location in Google Maps"
+                  className="mt-1 inline-block max-w-full text-muted [overflow-wrap:anywhere] transition-colors duration-200 hover:text-amber"
+                >
+                  {ADDRESS}
+                </a>
+
+                <span className="mt-1.5 block">
+                  <a
+                    href={MAPS_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Open the office location in Google Maps"
+                    className="inline-flex min-h-11 items-center gap-1 text-[15px] font-semibold text-amber transition-colors duration-200 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber"
+                  >
+                    View on map
+                    <ArrowUpRight className="size-4 shrink-0" aria-hidden="true" />
+                  </a>
+                </span>
               </div>
 
               <div>

@@ -1,6 +1,7 @@
 import { MAILTO_HREF, PHONE_TEL } from '@/data/contact'
 import { SITE } from '@/data/site'
 import ContactForm from './ui/ContactForm'
+import LocationCard from './ui/LocationCard'
 import Section from './ui/Section'
 import SectionHeading from './ui/SectionHeading'
 
@@ -8,6 +9,13 @@ import SectionHeading from './ui/SectionHeading'
  * One big #2A2A2A card holds both halves: the pitch on the left, the form on
  * the right. Phone and email are plain text lines rather than icon rows, and
  * both still link to the real `tel:` and `mailto:` targets.
+ *
+ * The address and map sit below the phone and email rather than beside them, so
+ * the frame gets the full column width. It is the tallest thing in this card, and
+ * a half-width map at `16 / 9` would be too short to pan usefully.
+ *
+ * Stacks as heading -> contact details -> form -> location on a phone, so the
+ * form stays above the map frame and the map never competes with it for height.
  */
 export default function Contact() {
   return (
@@ -48,6 +56,12 @@ export default function Contact() {
                 </dd>
               </div>
             </dl>
+
+            {/* Full width, below both columns: a half-width map at 16/9 is too
+                short to pan, and this keeps it clear of the form. */}
+            <div className="mt-10">
+              <LocationCard />
+            </div>
           </div>
 
           <ContactForm />
